@@ -649,7 +649,7 @@ impl Processor
         let num2: u16    = ((msb as u16) << 8) + lsb as u16;
         let (res, carry) = num1.overflowing_add(num2);
 
-        self.set_reg_pair(HL_PAIR_REG, (res << 8) as u8, num1 as u8);
+        self.set_reg_pair(HL_PAIR_REG, (res >> 8) as u8, res as u8);
         self.flags.carry_flag = carry;
     }
 
