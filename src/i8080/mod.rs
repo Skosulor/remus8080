@@ -169,6 +169,7 @@ impl Processor
             InstructionTypes::DCX  => self.dcx_op(),
             InstructionTypes::LHLD => self.lhld_op(),
             InstructionTypes::SHLD => self.shld_op(),
+            InstructionTypes::STAX => self.stax_op(),
             InstructionTypes::NOP  => (),
             InstructionTypes::Unknown => (),
         }
@@ -1007,6 +1008,21 @@ impl Processor
         self.set_memory_at(addr, l_reg_value);
         self.set_memory_at(addr + 1, h_reg_value);
         self.program_counter += 2;
+    }
+
+    fn stax_op(&mut self)
+    {
+        let (msb, lsb) = if self.current_op.byte_val & 0b00010000 == 0x10
+        {
+            self.get_reg_pair(DE_PAIR_REG)
+        }
+        else
+        {
+            self.get_reg_pair(BC_PAIR_REG)
+        };
+
+        let addr = ((msb as u16) << 8) + lsb as u16; 
+        self.set_memory_at(addr, self.get_reg(A_REG));
     }
 
     pub fn get_immediate(&mut self) -> u8

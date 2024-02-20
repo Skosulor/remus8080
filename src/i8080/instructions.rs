@@ -83,6 +83,7 @@ pub enum InstructionTypes
     RPO,
     LHLD,
     SHLD,
+    STAX,
     Unknown,
 }
 
@@ -300,7 +301,7 @@ impl Instruction
                 {
                     0x00                      => self.set_instruction(InstructionTypes::NOP),
                     0x01 | 0x11 | 0x21 | 0x31 => self.decode_lxi(),
-                    0x02 | 0x12               => self.name = "STAX NOT IMP".to_string(),
+                    0x02 | 0x12               => self.set_instruction(InstructionTypes::STAX),
                     0x03 | 0x13 | 0x23 | 0x33 => self.decode_inx(),
                     0x04 | 0x0C | 0x14 | 0x1C | 0x24 | 0x2C | 0x34 | 0x3C  => self.decode_inr(),
                     0x05 | 0x0D |  0x15 | 0x1D | 0x25 | 0x2D | 0x35 | 0x3D => self.decode_dcr(),
