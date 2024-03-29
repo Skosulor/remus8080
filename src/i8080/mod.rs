@@ -170,6 +170,9 @@ impl Processor
             InstructionTypes::LHLD => self.lhld_op(),
             InstructionTypes::SHLD => self.shld_op(),
             InstructionTypes::STAX => self.stax_op(),
+            InstructionTypes::STC  => self.stc_op(),
+            InstructionTypes::CMC  => self.cmc_op(),
+            InstructionTypes::CMA  => self.cma_op(),
             InstructionTypes::NOP  => (),
             InstructionTypes::Unknown => (),
         }
@@ -1023,6 +1026,21 @@ impl Processor
 
         let addr = ((msb as u16) << 8) + lsb as u16; 
         self.set_memory_at(addr, self.get_reg(A_REG));
+    }
+
+    fn stc_op(&mut self)
+    {
+        self.flags.carry_flag = true;
+    }
+
+    fn cmc_op(&mut self)
+    {
+        self.flags.carry_flag = !self.flags.carry_flag;
+    }
+
+    fn cma_op(&mut self)
+    {
+        self.registers.accumulator = !self.registers.accumulator;
     }
 
     pub fn get_immediate(&mut self) -> u8

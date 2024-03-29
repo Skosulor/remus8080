@@ -84,6 +84,9 @@ pub enum InstructionTypes
     LHLD,
     SHLD,
     STAX,
+    STC,
+    CMC,
+    CMA,
     Unknown,
 }
 
@@ -147,7 +150,6 @@ impl Instruction
 
     pub fn byte_to_op(&mut self, b: u8) 
     {
-        self.byte_val = b;
         *self = Instruction::new();
         self.byte_val = b;
 
@@ -317,11 +319,11 @@ impl Instruction
                     0x22 => self.set_instruction(InstructionTypes::SHLD),
                     0x27 => self.name = "DAA NOT IMP".to_string(),
                     0x2A => self.set_instruction(InstructionTypes::LHLD),
-                    0x2F => self.name = "CMA NOT IMP".to_string(),
+                    0x2F => self.set_instruction(InstructionTypes::CMA),
                     0x32 => self.set_instruction(InstructionTypes::STA),
-                    0x37 => self.name = "STC NOT IMP".to_string(),
+                    0x37 => self.set_instruction(InstructionTypes::STC),
                     0x3A => self.set_instruction(InstructionTypes::LDA),
-                    0x3F => self.name = "CMC NOT IMP".to_string(),
+                    0x3F => self.set_instruction(InstructionTypes::CMC),
                     _ => panic!("Misc should not exist!"),
                 }
             },
