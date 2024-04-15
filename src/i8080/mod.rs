@@ -320,8 +320,8 @@ impl Processor
                 if self.current_op.instruction_type == InstructionTypes::POP  
                     || self.current_op.instruction_type == InstructionTypes::PUSH
                 {
-                    self.flags.set_flags_u8(lsb_val);
-                    self.registers.accumulator = msb_val;
+                    self.flags.set_flags_u8(msb_val);
+                    self.registers.accumulator = lsb_val;
                 }
                 else
                 {
