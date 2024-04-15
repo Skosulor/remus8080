@@ -659,18 +659,18 @@ impl Processor
 
     fn rrc_op(&mut self)
     {
-        let accumulator       = self.get_reg(A_REG);
-        let res               = accumulator.rotate_right(1);
+        let mut accumulator   = self.get_reg(A_REG);
+        accumulator           = accumulator.rotate_right(1);
         self.flags.carry_flag = (accumulator & 0x80) == 0x80;
-        self.set_reg(A_REG, res);
+        self.set_reg(A_REG, accumulator);
     }
 
     fn rlc_op(&mut self)
     {
-        let accumulator       = self.get_reg(A_REG);
-        let res               = accumulator.rotate_left(1);
+        let mut accumulator   = self.get_reg(A_REG);
+        accumulator           = accumulator.rotate_left(1);
         self.flags.carry_flag = (accumulator & 0x01) == 0x01;
-        self.set_reg(A_REG, res);
+        self.set_reg(A_REG, accumulator);
     }
 
     fn dcr_op(&mut self)
