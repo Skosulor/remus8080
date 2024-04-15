@@ -173,6 +173,7 @@ impl Processor
             InstructionTypes::STC  => self.stc_op(),
             InstructionTypes::CMC  => self.cmc_op(),
             InstructionTypes::CMA  => self.cma_op(),
+            InstructionTypes::DAA  => self.daa_op(),
             InstructionTypes::NOP  => (),
             InstructionTypes::Unknown => (),
         }
@@ -1041,6 +1042,30 @@ impl Processor
     fn cma_op(&mut self)
     {
         self.registers.accumulator = !self.registers.accumulator;
+    }
+
+    fn daa_op(&mut self)
+    {
+        let mut accumulator = self.registers.accumulator;
+
+        if ((accumulator & 0x0F) > 9) || (self.flags.auxiliary_flag)
+        {
+            accumulator += 0x06;
+            if (accumulator & 0x0F) < 0x09
+            {
+                self.flags.auxiliary_flag = true;
+            }
+        }
+
+        if ((accumulator & 0xF0) > 0x90) || (self.flags.carry_flag)
+        {
+            (accumulator, self.flags.carry_flag) = accumulator.overflowing_add(0x60);
+        }
+
+        self.registers.accumulator = accumulator;
+        sign(self.registers.accumulator);
+        zero(self.registers.accumulator);
+        parity(self.registers.accumulator);
     }
 
     pub fn get_immediate(&mut self) -> u8

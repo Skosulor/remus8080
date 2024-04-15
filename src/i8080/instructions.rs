@@ -87,6 +87,7 @@ pub enum InstructionTypes
     STC,
     CMC,
     CMA,
+    DAA,
     Unknown,
 }
 
@@ -317,7 +318,7 @@ impl Instruction
                     0x1A | 0x0A => self.set_instruction(InstructionTypes::LDAX),
                     0x1F => self.set_instruction(InstructionTypes::RAR),
                     0x22 => self.set_instruction(InstructionTypes::SHLD),
-                    0x27 => self.name = "DAA NOT IMP".to_string(),
+                    0x27 => self.set_instruction(InstructionTypes::DAA),
                     0x2A => self.set_instruction(InstructionTypes::LHLD),
                     0x2F => self.set_instruction(InstructionTypes::CMA),
                     0x32 => self.set_instruction(InstructionTypes::STA),
