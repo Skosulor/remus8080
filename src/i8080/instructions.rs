@@ -1,6 +1,6 @@
 use crate::i8080::registers::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum AddressingMode 
 {
     Direct,
@@ -108,7 +108,7 @@ const XRA_GROUP: u8 = 0b10101000;
 const ORA_GROUP: u8 = 0b10110000;
 const CMP_GROUP: u8 = 0b10111000;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Instruction 
 {
     pub byte_val: u8,

@@ -14,7 +14,7 @@ use crate::i8080::registers::*;
 const MEMORY_SIZE: usize = 0xFFFFF;
 
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Processor 
 {
     // clock_freq: f32,
