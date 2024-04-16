@@ -175,6 +175,7 @@ impl Processor
             InstructionTypes::CMA  => self.cma_op(),
             InstructionTypes::DAA  => self.daa_op(),
             InstructionTypes::SPHL => self.sphl_op(),
+            InstructionTypes::XTHL => self.xthl_op(),
             InstructionTypes::NOP  => (),
             InstructionTypes::Unknown => (),
         }
@@ -1074,6 +1075,17 @@ impl Processor
         let stackpointer: u16 = ((self.registers.h as u16) << 8) + self.registers.l as u16;
         self.stack_pointer = stackpointer;
     }
+
+    fn xthl_op(&mut self)
+    {
+        let lsb = self.get_memory_at(self.stack_pointer);
+        let msb = self.get_memory_at(self.stack_pointer + 1);
+        self.set_memory_at(self.stack_pointer, self.registers.l);
+        self.set_memory_at(self.stack_pointer + 1, self.registers.h);
+        self.registers.l = lsb;
+        self.registers.h = msb;
+    }
+
     pub fn get_immediate(&mut self) -> u8
     {
         return self.memory[(self.program_counter + 1) as usize];
