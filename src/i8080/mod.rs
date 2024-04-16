@@ -179,7 +179,7 @@ impl Processor
             InstructionTypes::PCHL => self.pchl_op(),
             InstructionTypes::RST => self.rst_op(),
             InstructionTypes::NOP  => (),
-            InstructionTypes::Unknown => (),
+            InstructionTypes::Unknown => panic!("Uknown Instruction {:?}", self),
         }
     }
 
