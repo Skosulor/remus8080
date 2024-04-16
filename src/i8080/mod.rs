@@ -174,6 +174,7 @@ impl Processor
             InstructionTypes::CMC  => self.cmc_op(),
             InstructionTypes::CMA  => self.cma_op(),
             InstructionTypes::DAA  => self.daa_op(),
+            InstructionTypes::SPHL => self.sphl_op(),
             InstructionTypes::NOP  => (),
             InstructionTypes::Unknown => (),
         }
@@ -1068,6 +1069,11 @@ impl Processor
         parity(self.registers.accumulator);
     }
 
+    fn sphl_op(&mut self)
+    {
+        let stackpointer: u16 = ((self.registers.h as u16) << 8) + self.registers.l as u16;
+        self.stack_pointer = stackpointer;
+    }
     pub fn get_immediate(&mut self) -> u8
     {
         return self.memory[(self.program_counter + 1) as usize];

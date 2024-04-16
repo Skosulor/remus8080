@@ -88,6 +88,7 @@ pub enum InstructionTypes
     CMC,
     CMA,
     DAA,
+    SPHL,
     Unknown,
 }
 
@@ -283,7 +284,7 @@ impl Instruction
                     0xF6 => self.byte_to_immediate_op(),
                     0xF7 => self.name = "RST NOT IMP".to_string(),
                     0xF8 => self.set_instruction(InstructionTypes::RM),
-                    0xF9 => self.name = "SPHL NOT IMP".to_string(),
+                    0xF9 => self.set_instruction(InstructionTypes::SPHL),
                     0xFA => self.set_instruction(InstructionTypes::JM),
                     0xFB => self.set_instruction(InstructionTypes::EI),
                     0xFC => self.set_instruction(InstructionTypes::CM),
