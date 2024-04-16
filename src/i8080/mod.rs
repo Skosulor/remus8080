@@ -176,6 +176,7 @@ impl Processor
             InstructionTypes::DAA  => self.daa_op(),
             InstructionTypes::SPHL => self.sphl_op(),
             InstructionTypes::XTHL => self.xthl_op(),
+            InstructionTypes::PCHL => self.pchl_op(),
             InstructionTypes::NOP  => (),
             InstructionTypes::Unknown => (),
         }
@@ -1084,6 +1085,12 @@ impl Processor
         self.set_memory_at(self.stack_pointer + 1, self.registers.h);
         self.registers.l = lsb;
         self.registers.h = msb;
+    }
+
+    fn pchl_op(&mut self)
+    {
+        let program_counter: u16 = ((self.registers.h as u16) << 8) + self.registers.l as u16;
+        self.program_counter = program_counter - 1;
     }
 
     pub fn get_immediate(&mut self) -> u8

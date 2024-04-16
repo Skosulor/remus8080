@@ -21,7 +21,7 @@ pub enum InstructionTypes
     LXI, DCR, DAD, RRC, RLC, RAL, RAR, INX, DCX, LDA, LDAX, STA, PUSH,
     POP, CALL, NOP, RET, XCHG, OUT, EI, DI, INR, CP, CNZ, CC, CNC, CPO,
     CPE, CM, CZ, RC, RNC, RZ, RNZ, RM, RP, RPE, RPO, LHLD, SHLD, STAX,
-    STC, CMC, CMA, DAA, SPHL, XTHL,	
+    STC, CMC, CMA, DAA, SPHL, XTHL, PCHL, 
     Unknown,
 }
 
@@ -203,7 +203,7 @@ impl Instruction
                     0xE6 => self.byte_to_immediate_op(),
                     0xE7 => self.name = "RST NOT IMP".to_string(),
                     0xE8 => self.set_instruction(InstructionTypes::RPE),
-                    0xE9 => self.name = "PCHL NOT IMP".to_string(),
+                    0xE9 => self.set_instruction(InstructionTypes::PCHL),
                     0xEA => self.set_instruction(InstructionTypes::JPE),
                     0xEB => self.set_instruction(InstructionTypes::XCHG),
                     0xEC => self.set_instruction(InstructionTypes::CPE),
