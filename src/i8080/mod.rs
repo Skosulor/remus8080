@@ -177,6 +177,7 @@ impl Processor
             InstructionTypes::SPHL => self.sphl_op(),
             InstructionTypes::XTHL => self.xthl_op(),
             InstructionTypes::PCHL => self.pchl_op(),
+            InstructionTypes::RST => self.rst_op(),
             InstructionTypes::NOP  => (),
             InstructionTypes::Unknown => (),
         }
@@ -1091,6 +1092,15 @@ impl Processor
     {
         let program_counter: u16 = ((self.registers.h as u16) << 8) + self.registers.l as u16;
         self.program_counter = program_counter - 1;
+    }
+
+    fn rst_op(&mut self)
+    {
+        let reset_addr = self.current_op.byte_val & 0b00111000;
+        self.memory[(self.stack_pointer - 1) as usize] = (self.program_counter & 0x0F) as u8;
+        self.memory[(self.stack_pointer - 2) as usize] = (( self.program_counter >> 8 ) & 0x0F) as u8;
+        self.stack_pointer -= 2;
+        self.program_counter = ( reset_addr - 1 ) as u16;
     }
 
     pub fn get_immediate(&mut self) -> u8
