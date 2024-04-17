@@ -12,10 +12,12 @@ pub const DE_PAIR_REG: u8 = 0b01;
 pub const HL_PAIR_REG: u8 = 0b10;
 pub const SP_REG:      u8 = 0b11;
 
-pub const REGISTER_MASK   : u8 = 0b111;
-pub const MOVE_TO         : u8 = 3;
-pub const MOVE_FROM       : u8 = 0;
-pub const ARITHMETIC_WITH : u8 = 0;
+pub const REGISTER_MASK     : u8 = 0b111;
+pub const MOVE_TO_MASK      : u8 = 0b00111000;
+pub const MOVE_TO_BIT_POS   : u8 = 3;
+pub const MOVE_FROM_BIT_POS : u8 = 0;
+pub const MOVE_FROM_MASK    : u8 = 0b00000111;
+pub const ARITHMETIC_WITH   : u8 = 0;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Registers 

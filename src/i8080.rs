@@ -10,6 +10,7 @@ use std::u16;
 use crate::i8080::instructions::*;
 use crate::i8080::flags::*;
 use crate::i8080::registers::*;
+use crate::utils::*;
 
 const MEMORY_SIZE: usize = 0xFFFFF;
 
@@ -237,23 +238,23 @@ impl Processor
         self.registers = reg;
     }
 
-    fn set_reg(&mut self, reg:u8, val: u8)
+    fn set_reg(&mut self, register: u8, value: u8)
     {
-        match reg & 0b111
+        match register & 0b111
         {
-            B_REG   => self.registers.b = val,
-            C_REG   => self.registers.c = val,
-            D_REG   => self.registers.d = val,
-            E_REG   => self.registers.e = val,
-            H_REG   => self.registers.h = val,
-            L_REG   => self.registers.l = val,
+            B_REG   => self.registers.b = value,
+            C_REG   => self.registers.c = value,
+            D_REG   => self.registers.d = value,
+            E_REG   => self.registers.e = value,
+            H_REG   => self.registers.h = value,
+            L_REG   => self.registers.l = value,
             MEM_REF => 
             {
                 let addr = (self.registers.h as usize) << 8 | (self.registers.l as usize);
-                self.memory[addr] = val;
+                self.memory[addr] = value;
             },
-            A_REG   => self.registers.accumulator = val,
-            _ => panic!("No register {}", reg)
+            A_REG   => self.registers.accumulator = value,
+            _ => panic!("No register {}", register)
         }
     }
 
@@ -300,36 +301,36 @@ impl Processor
         }
     }
 
-    fn set_reg_pair(&mut self, reg: u8, msb_val: u8, lsb_val: u8)
+    fn set_reg_pair(&mut self, reg: u8, msb: u8, lsb: u8)
     {
         match reg
         {
             BC_PAIR_REG => 
             {
-                self.registers.b = msb_val;
-                self.registers.c = lsb_val;
+                self.registers.b = msb;
+                self.registers.c = lsb;
             }
             DE_PAIR_REG => 
             {
-                self.registers.d = msb_val;
-                self.registers.e = lsb_val;
+                self.registers.d = msb;
+                self.registers.e = lsb;
             }
             HL_PAIR_REG => 
             {
-                self.registers.h = msb_val;
-                self.registers.l = lsb_val;
+                self.registers.h = msb;
+                self.registers.l = lsb;
             }
             SP_REG =>
             {
                 if self.current_op.instruction_type == InstructionTypes::POP  
                     || self.current_op.instruction_type == InstructionTypes::PUSH
                 {
-                    self.flags.set_flags_u8(msb_val);
-                    self.registers.accumulator = lsb_val;
+                    self.flags.set_flags_u8(msb);
+                    self.registers.accumulator = lsb;
                 }
                 else
                 {
-                    self.stack_pointer = ((msb_val as u16) << 8) | lsb_val as u16;
+                    self.stack_pointer = bytes_to_word(msb, lsb);
                 }
             }
             _ => panic!("No register pair {}, PC at {}", reg, self.program_counter)
@@ -353,8 +354,8 @@ impl Processor
 
     fn mov_op(&mut self)
     {
-        let to = (self.current_op.byte_val & 0b00111000) >> MOVE_TO;
-        let from = (self.current_op.byte_val & 0b00000111) >> MOVE_FROM;
+        let to = (self.current_op.machine_code & MOVE_TO_MASK) >> MOVE_TO_BIT_POS;
+        let from = (self.current_op.machine_code & MOVE_FROM_MASK) >> MOVE_FROM_BIT_POS;
         let val = self.get_reg(from);
         self.set_reg(to, val);
     }
@@ -363,7 +364,6 @@ impl Processor
     {
         let accumulator = self.get_reg(A_REG);
 
-        // Fetch operand from register/memory or immediate
         let register = match self.current_op.instruction_type 
         {
             InstructionTypes::ADD | InstructionTypes::ADC => 
@@ -375,11 +375,9 @@ impl Processor
                 self.program_counter += 1;
                 self.memory[self.program_counter as usize]
             },
-            _ => {panic!("Add type is wrong, this panic should be impossible");}
+            _ => {panic!("Add type is wrong, {:?}", self);}
         };
 
-
-        // Either add with or wihtout the carry bit
         let (res, carry ) = 
             if with_carry 
             {
@@ -402,7 +400,6 @@ impl Processor
     {
         let accumulator = self.get_reg(A_REG);
 
-        // Fetch operand from register/memory or immediate
         let register = match self.current_op.instruction_type 
         {
             InstructionTypes::SUB | InstructionTypes::SBB => 
@@ -416,7 +413,6 @@ impl Processor
             },
             _ => {panic!("Add type is wrong, this panic should be impossible");}
         };
-
 
         let (res, carry ) = if with_carry 
         {
@@ -433,7 +429,6 @@ impl Processor
         self.set_reg(A_REG, res);
     }
 
-    // Logical AND
     fn ana_op(&mut self)
     {
         let accumulator = self.get_reg(A_REG);
@@ -455,7 +450,6 @@ impl Processor
         self.set_reg(A_REG, res);
     }
 
-    // Logaical OR
     fn ora_op(&mut self)
     {
         let accumulator = self.get_reg(A_REG);
@@ -479,7 +473,6 @@ impl Processor
 
     }
 
-    // Logical exclusive-OR
     fn xra_op(&mut self)
     {
         let accumulator = self.get_reg(A_REG);
@@ -502,7 +495,6 @@ impl Processor
         self.set_reg(A_REG, res);
     }
 
-    // Compare accumelator with reg or memory
     fn cmp_op(&mut self)
     {
         let accumulator = self.get_reg(A_REG);
@@ -652,9 +644,9 @@ impl Processor
         let reg_pair = self.current_op.low_nibble.unwrap();
 
         let (msb, lsb)   = self.get_reg_pair(reg_pair);
-        let num1: u16    = ((msb as u16) << 8) + lsb as u16;
+        let num1: u16    = bytes_to_word(msb, lsb);
         let (msb, lsb)   = self.get_reg_pair(HL_PAIR_REG);
-        let num2: u16    = ((msb as u16) << 8) + lsb as u16;
+        let num2: u16    = bytes_to_word(msb, lsb);
         let (res, carry) = num1.overflowing_add(num2);
 
         self.set_reg_pair(HL_PAIR_REG, (res >> 8) as u8, res as u8);
@@ -691,12 +683,12 @@ impl Processor
 
     fn ral_op(&mut self)
     {
-        let accumulator       = self.get_reg(A_REG);
+        let mut accumulator   = self.get_reg(A_REG);
         let carry             = self.flags.carry_flag;
         self.flags.carry_flag = (accumulator & 0x80) == 0x80;
-        let mut res           = accumulator << 1;
-        res                   = res | (carry as u8);
-        self.set_reg(A_REG, res);
+        accumulator           = accumulator << 1;
+        accumulator           = accumulator | (carry as u8);
+        self.set_reg(A_REG, accumulator);
     }
 
     fn rar_op(&mut self)
@@ -740,7 +732,7 @@ impl Processor
         let lsb;
         let msb;
 
-        if (self.current_op.byte_val & 0x10) == 0x10
+        if (self.current_op.machine_code & 0x10) == 0x10
         {
             (msb, lsb) = self.get_reg_pair(DE_PAIR_REG);
         }
@@ -831,8 +823,8 @@ impl Processor
     {
         let lsb_addr = self.memory[self.stack_pointer as usize];
         let msb_addr = self.memory[(self.stack_pointer + 1) as usize];
+        let addr: u16 = bytes_to_word(msb_addr, lsb_addr);
 
-        let addr: u16 = ((msb_addr as u16) << 8) + lsb_addr as u16;
         self.stack_pointer += 2;
         self.program_counter = addr - 1;
     }
@@ -1020,7 +1012,7 @@ impl Processor
 
     fn stax_op(&mut self)
     {
-        let (msb, lsb) = if self.current_op.byte_val & 0b00010000 == 0x10
+        let (msb, lsb) = if self.current_op.machine_code & 0b00010000 == 0x10
         {
             self.get_reg_pair(DE_PAIR_REG)
         }
@@ -1096,7 +1088,7 @@ impl Processor
 
     fn rst_op(&mut self)
     {
-        let reset_addr = self.current_op.byte_val & 0b00111000;
+        let reset_addr = self.current_op.machine_code & 0b00111000;
         self.memory[(self.stack_pointer - 1) as usize] = (self.program_counter & 0x0F) as u8;
         self.memory[(self.stack_pointer - 2) as usize] = (( self.program_counter >> 8 ) & 0x0F) as u8;
         self.stack_pointer -= 2;

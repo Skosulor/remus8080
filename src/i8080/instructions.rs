@@ -45,7 +45,7 @@ const CMP_GROUP: u8 = 0b10111000;
 #[derive(Clone, Debug)]
 pub struct Instruction 
 {
-    pub byte_val: u8,
+    pub machine_code: u8,
     name: String,
     // cycles: u8,
     adress_mode: AddressingMode,
@@ -60,7 +60,7 @@ impl Instruction
     {
         let ins = Instruction 
         {
-            byte_val: 0,
+            machine_code: 0,
             name: "_".to_string(),
             // cycles: 1,
             adress_mode: AddressingMode::Unknown,
@@ -80,13 +80,13 @@ impl Instruction
 
     pub fn get_name_byte(self) -> (u8, String) 
     {
-        (self.byte_val, self.name.clone())
+        (self.machine_code, self.name.clone())
     }
 
     pub fn byte_to_op(&mut self, b: u8) 
     {
         *self = Instruction::new();
-        self.byte_val = b;
+        self.machine_code = b;
 
         match b & OP_CODE_GROUP_MASK
         {
@@ -97,8 +97,8 @@ impl Instruction
             {
                 self.adress_mode = AddressingMode::Direct;
                 self.instruction_type = InstructionTypes::MOV;
-                self.low_nibble = Some((b >> MOVE_TO) & REGISTER_MASK);
-                self.high_nibble = Some((b >> MOVE_FROM) & REGISTER_MASK);
+                self.low_nibble = Some((b >> MOVE_TO_BIT_POS) & REGISTER_MASK);
+                self.high_nibble = Some((b >> MOVE_FROM_BIT_POS) & REGISTER_MASK);
                 let name = format!("MOV {},{} ", Registers::translate_to_reg(self.low_nibble.unwrap()), Registers::translate_to_reg(self.high_nibble.unwrap()));
                 self.name = name;
                 return
@@ -159,7 +159,7 @@ impl Instruction
                         let name = format!("CMP {}", Registers::translate_to_reg(self.low_nibble.unwrap()));
                         self.name = name;
                     }
-                    _ => panic!("Arithemtic does not exist!: {:X}", self.byte_val),
+                    _ => panic!("Arithemtic does not exist!: {:X}", self.machine_code),
                 }
             },
             BRANCH_STACK_INSTRUCTION_GROUP => 
@@ -270,14 +270,14 @@ impl Instruction
 
     fn decode_pop(&mut self)
     {
-        self.low_nibble = Some(( self.byte_val & 0x30 ) >> 4);
+        self.low_nibble = Some(( self.machine_code & 0x30 ) >> 4);
         self.name = format!("POP {}", Registers::translate_to_reg_pair(self.low_nibble.unwrap()));
         self.instruction_type = InstructionTypes::POP;
     }
 
     fn decode_push(&mut self)
     {
-        self.low_nibble = Some(( self.byte_val & 0x30 ) >> 4);
+        self.low_nibble = Some(( self.machine_code & 0x30 ) >> 4);
         self.name = format!("PUSH {}", Registers::translate_to_reg_pair(self.low_nibble.unwrap()));
         self.instruction_type = InstructionTypes::PUSH;
     }
@@ -285,26 +285,26 @@ impl Instruction
     fn decode_inx(&mut self)
     {
         self.set_instruction(InstructionTypes::INX);
-        self.low_nibble = Some((self.byte_val & 0x30) >> 4);
+        self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_dcx(&mut self)
     {
         self.set_instruction(InstructionTypes::DCX);
-        self.low_nibble = Some((self.byte_val & 0x30) >> 4);
+        self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_dad(&mut self)
     {
         self.set_instruction(InstructionTypes::DAD);
-        self.low_nibble = Some((self.byte_val & 0x30) >> 4);
+        self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_lxi(&mut self)
     {
         self.adress_mode = AddressingMode::Direct;
         self.set_instruction(InstructionTypes::LXI);
-        self.low_nibble = Some((self.byte_val & 0x30) >> 4);
+        self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
 
@@ -312,25 +312,25 @@ impl Instruction
     {
         self.adress_mode = AddressingMode::Direct;
         self.instruction_type = InstructionTypes::DCR;
-        self.low_nibble = Some((self.byte_val & 0x38) >> 3);
+        self.low_nibble = Some((self.machine_code & 0x38) >> 3);
         self.name = format!("DCR {}", Registers::translate_to_reg(self.low_nibble.unwrap()));
     }
 
     fn decode_inr(&mut self)
     {
         self.instruction_type = InstructionTypes::INR;
-        self.low_nibble = Some((self.byte_val & 0x38) >> 3);
+        self.low_nibble = Some((self.machine_code & 0x38) >> 3);
         self.name = format!("INR {}", Registers::translate_to_reg(self.low_nibble.unwrap()));
     }
 
     fn immediate_op_helper(&mut self, name1: String, op1: InstructionTypes, name2: String, op2: InstructionTypes)
     {
-        if self.byte_val & 0x0F == 0x06
+        if self.machine_code & 0x0F == 0x06
         {
             self.instruction_type = op1;
             self.name = name1;
         }
-        else if self.byte_val & 0x0F == 0x0E
+        else if self.machine_code & 0x0F == 0x0E
         {
             self.instruction_type = op2;
             self.name = name2;
@@ -346,12 +346,12 @@ impl Instruction
     {
         self.adress_mode = AddressingMode::Direct;
 
-        match self.byte_val & 0xF0
+        match self.machine_code & 0xF0
         {
             0x00 | 0x10 | 0x20 | 0x30 =>
             {
                 self.instruction_type = InstructionTypes::MVI;
-                self.low_nibble = Some((self.byte_val & 0x38) >> 3);
+                self.low_nibble = Some((self.machine_code & 0x38) >> 3);
                 let name = format!("MVI {},d8 ", Registers::translate_to_reg(self.low_nibble.unwrap()));
                 self.name = name;
                 return
