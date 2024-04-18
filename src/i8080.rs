@@ -29,20 +29,19 @@ pub struct Processor
     interrupts_enabled: bool,
 }
 
-
 impl Processor 
 {
     pub fn from_file(p: String) -> Processor 
     {
         let mut proc = Processor 
         {
-            stack_pointer: 0x20,
-            program_counter: 0,
-            memory: [0; MEMORY_SIZE],
-            flags: StatusFlags::new(),
-            current_op: Instruction::new(),
-            registers: Registers::new(),
-            out: 0,
+            stack_pointer     : 0x20,
+            program_counter   : 0,
+            memory            : [0; MEMORY_SIZE],
+            flags             : StatusFlags::new(),
+            current_op        : Instruction::new(),
+            registers         : Registers  ::new(),
+            out               : 0,
             interrupts_enabled: false,
         };
 
@@ -64,27 +63,28 @@ impl Processor
 
     pub fn from_bytes(bytes: Vec<u8>) -> Processor 
     {
-        let mut proc = Processor 
+        let mut processor = Processor 
         {
-            stack_pointer: 0x20,
-            program_counter: 0,
-            memory: [0; MEMORY_SIZE],
-            flags: StatusFlags::new(),
-            current_op: Instruction::new(),
-            registers: Registers::new(),
-            out: 0,
+            stack_pointer     : 0x20,
+            program_counter   : 0,
+            memory            : [0; MEMORY_SIZE],
+            flags             : StatusFlags::new(),
+            current_op        : Instruction::new(),
+            registers         : Registers  ::new(),
+            out               : 0,
             interrupts_enabled: false,
         };
 
         for (i, byte) in bytes.iter().enumerate()
         {
-            proc.memory[i] = *byte;
+            processor.memory[i] = *byte;
         }
-        proc
+        return processor;
     }
 
     pub fn clock(&mut self) 
     {
+        self.fetch_instruction();
         self.fetch_instruction();
         self.execute_instruction();
         self.update_program_counter();
@@ -178,7 +178,7 @@ impl Processor
             InstructionTypes::SPHL => self.sphl_op(),
             InstructionTypes::XTHL => self.xthl_op(),
             InstructionTypes::PCHL => self.pchl_op(),
-            InstructionTypes::RST => self.rst_op(),
+            InstructionTypes::RST  => self.rst_op(),
             InstructionTypes::NOP  => (),
             InstructionTypes::Unknown => panic!("Uknown Instruction {:?}", self),
         }

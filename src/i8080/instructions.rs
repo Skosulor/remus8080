@@ -45,13 +45,13 @@ const CMP_GROUP: u8 = 0b10111000;
 #[derive(Clone, Debug)]
 pub struct Instruction 
 {
-    pub machine_code: u8,
-    name: String,
-    // cycles: u8,
-    adress_mode: AddressingMode,
+    pub machine_code    : u8,
+    name                : String,
+    // cycles           : u8,
+    adress_mode         : AddressingMode,
     pub instruction_type: InstructionTypes,
-    pub low_nibble: Option<u8>,
-    pub high_nibble: Option<u8>,
+    pub low_nibble      : Option<u8>,
+    pub high_nibble     : Option<u8>,
 }
 
 impl Instruction
@@ -60,13 +60,13 @@ impl Instruction
     {
         let ins = Instruction 
         {
-            machine_code: 0,
-            name: "_".to_string(),
-            // cycles: 1,
-            adress_mode: AddressingMode::Unknown,
+            machine_code    : 0,
+            name            : "_".to_string(),
+            // cycles       : 1,
+            adress_mode     : AddressingMode  ::Unknown,
             instruction_type: InstructionTypes::Unknown,
-            low_nibble: None,
-            high_nibble: None,
+            low_nibble      : None,
+            high_nibble     : None,
         };
         ins
     }
