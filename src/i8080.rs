@@ -14,7 +14,7 @@ use crate::utils::*;
 
 const MEMORY_SIZE: usize = 0xFFFFF;
 
-
+/// The main struct that will hold the state of the processor attributes
 #[derive(Clone, Debug)]
 pub struct Processor 
 {
@@ -352,6 +352,7 @@ impl Processor
         self.memory[addr as usize] = val;
     }
 
+    /// The move (MOV) instruction copies the value of the second register into the first register.
     fn mov_op(&mut self)
     {
         let to = (self.current_op.machine_code & MOVE_TO_MASK) >> MOVE_TO_BIT_POS;
@@ -360,6 +361,7 @@ impl Processor
         self.set_reg(to, val);
     }
 
+    /// The addition (ADD) instruction adds the value of the second register to the first register.
     fn add_op(&mut self, with_carry: bool)
     {
         let accumulator = self.get_reg(A_REG);
@@ -396,6 +398,8 @@ impl Processor
         self.set_reg(A_REG, res);
     }
 
+    /// The subtraction (SUB) instruction subtracts the value of the second register from the 
+    /// first register.
     fn sub_op(&mut self, with_carry: bool)
     {
         let accumulator = self.get_reg(A_REG);
@@ -429,6 +433,8 @@ impl Processor
         self.set_reg(A_REG, res);
     }
 
+    /// The logical AND (ANA) instruction performs a bitwise AND operation between the accumulator 
+    /// and the second register.
     fn ana_op(&mut self)
     {
         let accumulator = self.get_reg(A_REG);
@@ -450,6 +456,8 @@ impl Processor
         self.set_reg(A_REG, res);
     }
 
+    /// The logical OR (ORA) instruction performs a bitwise OR operation between the accumulator and
+    /// the second register.
     fn ora_op(&mut self)
     {
         let accumulator = self.get_reg(A_REG);
@@ -473,6 +481,8 @@ impl Processor
 
     }
 
+    /// The logical exclusive OR (XRA) instruction performs a bitwise XOR operation between the 
+    /// accumulator and the second register.
     fn xra_op(&mut self)
     {
         let accumulator = self.get_reg(A_REG);
@@ -495,6 +505,8 @@ impl Processor
         self.set_reg(A_REG, res);
     }
 
+    /// The compare (CMP) instruction subtracts the value of the second register from the first 
+    /// register and sets respective flag based on the result, but the result is not stored.
     fn cmp_op(&mut self)
     {
         let accumulator = self.get_reg(A_REG);
@@ -516,6 +528,8 @@ impl Processor
         self.set_flags_cszp(carry, aux_flag, res);
     }
 
+    /// Move immediate (MVI) instruction copies the immediate next value in the memory into the 
+    /// specified register.
     fn mvi_op(&mut self)
     {
         self.program_counter += 1;
@@ -523,6 +537,8 @@ impl Processor
         self.set_reg(self.current_op.low_nibble.unwrap(), result);
     }
 
+    /// Jump (JMP) instruction sets the program counter to the address specified in the next two
+    /// bytes in the memory.
     fn jmp_op(&mut self)
     {
         let mut addr = self.get_direct_address();
@@ -533,6 +549,8 @@ impl Processor
         self.program_counter = addr; 
     }
     
+    /// Jump not zero (JNZ) instruction sets the program counter to the address specified in the next 
+    /// two bytes in the memory if the zero flag is not set.
     fn jnz_op(&mut self)
     {
         if !self.flags.zero_flag
@@ -545,6 +563,8 @@ impl Processor
         }
     }
 
+    /// Jump zero (JZ) instruction sets the program counter to the address specified in the next
+    /// two bytes in the memory if the zero flag is set.
     fn jz_op(&mut self)
     {
         if self.flags.zero_flag
@@ -557,6 +577,8 @@ impl Processor
         }
     }
 
+    /// Jump not carry (JNC) instruction sets the program counter to the address specified in the next
+    /// two bytes in the memory if the carry flag is not set.
     fn jnc_op(&mut self)
     {
         if !self.flags.carry_flag
@@ -569,6 +591,8 @@ impl Processor
         }
     }
 
+    /// Jump carry (JC) instruction sets the program counter to the address specified in the next
+    /// two bytes in the memory if the carry flag is set.
     fn jc_op(&mut self)
     {
         if self.flags.carry_flag
@@ -581,6 +605,8 @@ impl Processor
         }
     }
 
+    /// Jump parity odd (JPO) instruction sets the program counter to the address specified in the next
+    /// two bytes in the memory if the parity flag is not set.
     fn jpo_op(&mut self)
     {
         if !self.flags.parity_flag
@@ -593,6 +619,8 @@ impl Processor
         }
     }
 
+    /// Jump parity even (JPE) instruction sets the program counter to the address specified in the next
+    /// two bytes in the memory if the parity flag is set.
     fn jpe_op(&mut self)
     {
         if self.flags.parity_flag
@@ -605,6 +633,8 @@ impl Processor
         }
     }
 
+    /// Jump positive (JP) instruction sets the program counter to the address specified in the next
+    /// two bytes in the memory if the sign flag is not set.
     fn jp_op(&mut self)
     {
         if !self.flags.sign_flag
@@ -617,6 +647,8 @@ impl Processor
         }
     }
 
+    /// Jump negative (JM) instruction sets the program counter to the address specified in the next
+    /// two bytes in the memory if the sign flag is set.
     fn jm_op(&mut self)
     {
         if self.flags.sign_flag
@@ -629,6 +661,8 @@ impl Processor
         }
     }
 
+    /// Load immediate (LXI) instruction loads the immediate next two bytes in the memory into the
+    /// specified register pair.
     fn lxi_op(&mut self)
     {
         let pc        = self.program_counter as usize;
@@ -639,6 +673,7 @@ impl Processor
         self.program_counter += 2;
     }
 
+    /// double add (DAD) instruction adds the value of the specified register pair to the HL register pair.
     fn dad_op(&mut self)
     {
         let reg_pair = self.current_op.low_nibble.unwrap();
@@ -653,6 +688,8 @@ impl Processor
         self.flags.carry_flag = carry;
     }
 
+    /// The rotate right through carry (RRC) instruction rotates the accumulator right through the carry flag.
+    /// The carry flag is set to the value of the least significant bit of the accumulator.
     fn rrc_op(&mut self)
     {
         let mut accumulator   = self.get_reg(A_REG);
@@ -661,6 +698,8 @@ impl Processor
         self.set_reg(A_REG, accumulator);
     }
 
+    /// The rotate left through carry (RLC) instruction rotates the accumulator left through the carry flag.
+    /// The carry flag is set to the value of the most significant bit of the accumulator.
     fn rlc_op(&mut self)
     {
         let mut accumulator   = self.get_reg(A_REG);
@@ -669,6 +708,8 @@ impl Processor
         self.set_reg(A_REG, accumulator);
     }
 
+    /// The decrement (DCR) instruction decrements the value of the specified register by 1.
+    /// The auxiliary flag is set if the lower nibble of the register is 0.
     fn dcr_op(&mut self)
     {
         let reg                   = self.current_op.low_nibble.unwrap();
@@ -681,6 +722,8 @@ impl Processor
         self.set_reg(reg, res);
     }
 
+    /// The rotate left (RAL) instruction rotates the accumulator left through the carry flag.
+    /// The carry flag is set to the value of the most significant bit of the accumulator.
     fn ral_op(&mut self)
     {
         let mut accumulator   = self.get_reg(A_REG);
@@ -691,6 +734,8 @@ impl Processor
         self.set_reg(A_REG, accumulator);
     }
 
+    /// The rotate right (RAR) instruction rotates the accumulator right through the carry flag.
+    /// The carry flag is set to the value of the least significant bit of the accumulator.
     fn rar_op(&mut self)
     {
         let accumulator       = self.get_reg(A_REG);
@@ -701,6 +746,7 @@ impl Processor
         self.set_reg(A_REG, res);
     }
 
+    /// The decrement (DCX) instruction decrements the value of the specified register pair by 1.
     fn dcx_op(&mut self)
     {
         let reg_pair   = self.current_op.low_nibble.unwrap();
@@ -710,6 +756,7 @@ impl Processor
         self.set_reg_pair(reg_pair, (res >> 8) as u8, res as u8);
     }
 
+    /// The increment (INX) instruction increments the value of the specified register pair by 1.
     fn inx_op(&mut self)
     {
         let reg_pair   = self.current_op.low_nibble.unwrap();
@@ -719,6 +766,8 @@ impl Processor
         self.set_reg_pair(reg_pair, (res >> 8) as u8, res as u8);
     }
 
+    /// load accumulator (LDA) instruction loads the value at the specified address in the memory into the accumulator.
+    /// The address is specified in the next two bytes in the memory.
     fn lda_op(&mut self)
     {
         let addr = self.get_direct_address();
@@ -727,6 +776,8 @@ impl Processor
         self.set_reg(A_REG, value);
     }
 
+    /// load accumulator indirect (LDAX) instruction loads the value at the address specified by the BC or DE register pair
+    /// into the accumulator.
     fn ldax_op(&mut self)
     {
         let lsb;
@@ -744,6 +795,8 @@ impl Processor
         self.set_reg(A_REG, self.memory[address as usize]);
     }
 
+    /// store accumulator (STA) instruction stores the value of the accumulator into the address 
+    /// specified in the next two bytes in the memory.
     fn sta_op(&mut self)
     {
         let addr = self.get_direct_address();
@@ -752,6 +805,7 @@ impl Processor
         self.memory[addr as usize] = value;
     }
 
+    /// push (PUSH) instruction pushes the value of the specified register pair onto the stack.
     fn push_op(&mut self)
     {
         let (msb, lsb) = self.get_reg_pair(self.current_op.low_nibble.unwrap());
@@ -760,6 +814,7 @@ impl Processor
         self.stack_pointer -= 2;
     }
 
+    /// pop (POP) instruction pops the value of the specified register pair from the stack.
     fn pop_op(&mut self)
     {
         let lsb = self.memory[(self.stack_pointer + 0) as usize];
@@ -768,6 +823,8 @@ impl Processor
         self.set_reg_pair(self.current_op.low_nibble.unwrap(), msb, lsb);
     }
 
+    /// call (CALL) instruction pushes the address of the next instruction onto the stack and sets the program counter
+    /// to the address specified in the next two bytes in the memory.
     fn call_op(&mut self)
     {
         let addr: u16         = self.get_direct_address();
@@ -782,6 +839,8 @@ impl Processor
         self.program_counter = addr - 1;
     }
 
+    /// call non zero (CNZ) instruction calls the address specified in the next two bytes in the 
+    /// memory if the zero flag is not set.
     fn cz_op(&mut self)
     {
         if self.flags.zero_flag
@@ -794,6 +853,8 @@ impl Processor
         }
     }
 
+    /// call minus (CM) instruction calls the address specified in the next two bytes in the
+    /// memory if the sign flag is set.
     fn cm_op(&mut self)
     {
         if self.flags.sign_flag
@@ -806,6 +867,8 @@ impl Processor
         }
     }
 
+    /// call plus (CP) instruction calls the address specified in the next two bytes in the
+    /// memory if the sign flag is not set.
     fn cp_op(&mut self)
     {
         if self.flags.sign_flag == false
@@ -818,7 +881,7 @@ impl Processor
         }
     }
 
-
+    /// return (RET) instruction pops the address from the stack and sets the program counter to that address.
     fn ret_op(&mut self)
     {
         let lsb_addr = self.memory[self.stack_pointer as usize];
@@ -830,6 +893,7 @@ impl Processor
     }
 
 
+    /// The exchange (XCHG) instruction exchanges the values of the DE and HL register pairs.
     fn xchg_op(&mut self)
     {
         let regs = self.get_registers();
@@ -839,21 +903,25 @@ impl Processor
         self.set_reg(L_REG, regs.e);
     }
 
+    /// Output (OUT) instruction outputs the value of the accumulator to out.
     fn out_op(&mut self)
     {
         self.out = self.get_reg(A_REG);
     }
 
+    /// The enable interrupts (EI) instruction enables interrupts.
     fn ei_op(&mut self)
     {
         self.interrupts_enabled = true;
     }
 
+    /// The disable interrupts (DI) instruction disables interrupts.
     fn di_op(&mut self)
     {
         self.interrupts_enabled = false;
     }
 
+    /// The increment (INR) instruction increments the value of the specified register by 1.
     fn inr_op(&mut self)
     {
         let reg                   = self.current_op.low_nibble.unwrap();
@@ -866,6 +934,7 @@ impl Processor
         self.set_reg(reg, res);
     }
 
+    /// call non zero (CNZ) instruction calls the address specified in the next two bytes in the
     fn cnz_op(&mut self)
     {
         if !self.flags.zero_flag
@@ -878,6 +947,8 @@ impl Processor
         }
     }
 
+    /// call carry (CC) instruction calls the address specified in the next two bytes in the
+    /// memory if the carry flag is set.
     fn cc_op(&mut self)
     {
         if self.flags.carry_flag
@@ -890,6 +961,8 @@ impl Processor
         }
     }
 
+    /// call non carry (CNC) instruction calls the address specified in the next two bytes in the
+    /// memory if the carry flag is not set.
     fn cnc_op(&mut self)
     {
         if !self.flags.carry_flag
@@ -902,6 +975,8 @@ impl Processor
         }
     }
 
+    /// call parity odd (CPO) instruction calls the address specified in the next two bytes in the
+    /// memory if the parity flag is not set.
     fn cpo_op(&mut self)
     {
         if !self.flags.parity_flag
@@ -914,6 +989,8 @@ impl Processor
         }
     }
 
+    /// call parity even (CPE) instruction calls the address specified in the next two bytes in the
+    /// memory if the parity flag is set.
     fn cpe_op(&mut self)
     {
         if self.flags.parity_flag
@@ -926,6 +1003,8 @@ impl Processor
         }
     }
 
+    /// return carry (RC) instruction pops the address from the stack and sets the program counter 
+    /// to that address if the carry flag is set.
     fn rc_op(&mut self)
     {
         if self.flags.carry_flag
@@ -934,6 +1013,8 @@ impl Processor
         }
     }
 
+    /// return non carry (RNC) instruction pops the address from the stack and sets the program counter
+    /// to that address if the carry flag is not set.
     fn rnc_op(&mut self)
     {
         if !self.flags.carry_flag
@@ -942,6 +1023,8 @@ impl Processor
         }
     }
 
+    /// return zero (RZ) instruction pops the address from the stack and sets the program counter
+    /// to that address if the zero flag is set.
     fn rz_op(&mut self)
     {
         if self.flags.zero_flag
@@ -950,6 +1033,8 @@ impl Processor
         }
     }
 
+    /// return non zero (RNZ) instruction pops the address from the stack and sets the program counter
+    /// to that address if the zero flag is not set.
     fn rnz_op(&mut self)
     {
         if !self.flags.zero_flag
@@ -958,6 +1043,8 @@ impl Processor
         }
     }
 
+    /// return minus (RM) instruction pops the address from the stack and sets the program counter
+    /// to that address if the sign flag is set.
     fn rm_op(&mut self)
     {
         if self.flags.sign_flag
@@ -966,6 +1053,8 @@ impl Processor
         }
     }
 
+    /// return plus (RP) instruction pops the address from the stack and sets the program counter
+    /// to that address if the sign flag is not set.
     fn rp_op(&mut self)
     {
         if !self.flags.sign_flag
@@ -974,6 +1063,8 @@ impl Processor
         }
     }
 
+    /// return parity even (RPE) instruction pops the address from the stack and sets the program counter
+    /// to that address if the parity flag is set.
     fn rpe_op(&mut self)
     {
         if self.flags.parity_flag
@@ -982,6 +1073,8 @@ impl Processor
         }
     }
 
+    /// return parity odd (RPO) instruction pops the address from the stack and sets the program counter
+    /// to that address if the parity flag is not set.
     fn rpo_op(&mut self)
     {
         if !self.flags.parity_flag
@@ -990,6 +1083,8 @@ impl Processor
         }
     }
 
+    /// The exchange stack (XTHL) instruction exchanges the values of the HL register pair and the 
+    /// top of the stack.
     fn lhld_op(&mut self)
     {
         let addr = self.get_direct_address();
@@ -1000,6 +1095,8 @@ impl Processor
         self.program_counter += 2;
     }
 
+    /// The exchange stack (XTHL) instruction exchanges the values of the HL register pair and the
+    /// top of the stack.
     fn shld_op(&mut self)
     {
         let addr = self.get_direct_address();
@@ -1010,6 +1107,8 @@ impl Processor
         self.program_counter += 2;
     }
 
+    /// The store accumulator indirect (STAX) instruction stores the value of the accumulator at the
+    /// address specified by the BC or DE register pair.
     fn stax_op(&mut self)
     {
         let (msb, lsb) = if self.current_op.machine_code & 0b00010000 == 0x10
@@ -1025,21 +1124,25 @@ impl Processor
         self.set_memory_at(addr, self.get_reg(A_REG));
     }
 
+    /// set carry (STC) instruction sets the carry flag.
     fn stc_op(&mut self)
     {
         self.flags.carry_flag = true;
     }
 
+    /// complement carry (CMC) instruction complements the carry flag.
     fn cmc_op(&mut self)
     {
         self.flags.carry_flag = !self.flags.carry_flag;
     }
 
+    /// complement accumulator (CMA) instruction complements the accumulator.
     fn cma_op(&mut self)
     {
         self.registers.accumulator = !self.registers.accumulator;
     }
 
+    /// decimal adjust accumulator (DAA) instruction adjusts the accumulator to a binary coded decimal.
     fn daa_op(&mut self)
     {
         let mut accumulator = self.registers.accumulator;
@@ -1064,12 +1167,15 @@ impl Processor
         parity(self.registers.accumulator);
     }
 
+    /// special purpose register and accumulator (SPHL) instruction loads the value of the HL 
+    /// register pair into the stack pointer.
     fn sphl_op(&mut self)
     {
         let stackpointer: u16 = ((self.registers.h as u16) << 8) + self.registers.l as u16;
         self.stack_pointer = stackpointer;
     }
 
+    /// xchange register pair (XCHG) instruction exchanges the values of the HL and DE register pairs.
     fn xthl_op(&mut self)
     {
         let lsb = self.get_memory_at(self.stack_pointer);
@@ -1080,12 +1186,16 @@ impl Processor
         self.registers.h = msb;
     }
 
+    /// load program counter and HL register pair (PCHL) instruction loads the value of the HL 
+    /// register pair into the program counter.
     fn pchl_op(&mut self)
     {
         let program_counter: u16 = ((self.registers.h as u16) << 8) + self.registers.l as u16;
         self.program_counter = program_counter - 1;
     }
 
+    /// reset (RST) instruction pushes the address of the next instruction onto the stack and sets 
+    /// the program counter to the specified address.
     fn rst_op(&mut self)
     {
         let reset_addr = self.current_op.machine_code & 0b00111000;
