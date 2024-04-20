@@ -12,9 +12,9 @@
 - [ ] Rename project, it is no longer about space invaders.. 
 - [ ] Add functionality to dissasmbler to switch all numbers to hex
 - [ ] Add more informations to instructions in dissasembler, e.g. RST should also display a nubmer, CPI should show the value that is compared
-- [ ] Add cycle count to debugger
-- [x] Add cycle count to each instruction
-- [ ] Add possibility to run at certain HZ
+- [X] Add cycle count to debugger
+- [X] Add cycle count to each instruction
+- [X] Add possibility to run at certain HZ
 
 # Maybe
 - [ ] Rename low_byte & high_byte in instructions to Registers & give them an enum type?
