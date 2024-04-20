@@ -47,7 +47,7 @@ pub struct Instruction
 {
     pub machine_code    : u8,
     name                : String,
-    // cycles           : u8,
+    cycles              : u8,
     adress_mode         : AddressingMode,
     pub instruction_type: InstructionTypes,
     pub low_nibble      : Option<u8>,
@@ -62,7 +62,7 @@ impl Instruction
         {
             machine_code    : 0,
             name            : "_".to_string(),
-            // cycles       : 1,
+            cycles          : 1,
             adress_mode     : AddressingMode  ::Unknown,
             instruction_type: InstructionTypes::Unknown,
             low_nibble      : None,
@@ -100,6 +100,7 @@ impl Instruction
                 self.low_nibble = Some((b >> MOVE_TO_BIT_POS) & REGISTER_MASK);
                 self.high_nibble = Some((b >> MOVE_FROM_BIT_POS) & REGISTER_MASK);
                 let name = format!("MOV {},{} ", Registers::translate_to_reg(self.low_nibble.unwrap()), Registers::translate_to_reg(self.high_nibble.unwrap()));
+                self.cycles = 1;
                 self.name = name;
                 return
             },
@@ -109,6 +110,7 @@ impl Instruction
             {
                 self.low_nibble = Some((b >> ARITHMETIC_WITH) & REGISTER_MASK);
                 self.adress_mode = AddressingMode::Direct;
+                self.cycles = 1;
                 match b & ARITHMETIC_LOGICAL_GROUP_MASK
                 {
                     ADD_GROUP =>
@@ -166,64 +168,64 @@ impl Instruction
             {
                 match b 
                 {
-                    0xC0 => self.set_instruction(InstructionTypes::RNZ, ""),
+                    0xC0 => self.set_instruction(InstructionTypes::RNZ, "", 1),
                     0xC1 | 0xD1 | 0xE1 | 0xF1 => self.decode_pop(),
-                    0xC2 => self.set_instruction(InstructionTypes::JNZ, ""),
-                    0xC3 => self.set_instruction(InstructionTypes::JMP, ", Hello"),
-                    0xC4 => self.set_instruction(InstructionTypes::CNZ, ""),
+                    0xC2 => self.set_instruction(InstructionTypes::JNZ, "", 3),
+                    0xC3 => self.set_instruction(InstructionTypes::JMP, "", 3),
+                    0xC4 => self.set_instruction(InstructionTypes::CNZ, "", 3),
                     0xC5 | 0xD5 | 0xE5 | 0xF5 => self.decode_push(),
                     0xC6 => self.byte_to_immediate_op(),
-                    0xC7 => self.set_instruction(InstructionTypes::RST, ""),
-                    0xC8 => self.set_instruction(InstructionTypes::RZ, ""),
-                    0xC9 => self.set_instruction(InstructionTypes::RET, ""),
-                    0xCA => self.set_instruction(InstructionTypes::JZ, ""),
+                    0xC7 => self.set_instruction(InstructionTypes::RST, "", 1),
+                    0xC8 => self.set_instruction(InstructionTypes::RZ, "", 1),
+                    0xC9 => self.set_instruction(InstructionTypes::RET, "", 1),
+                    0xCA => self.set_instruction(InstructionTypes::JZ, "", 3),
                     0xCB => self.name = "?? NOT IMP".to_string(),
-                    0xCC => self.set_instruction(InstructionTypes::CZ, ""),
-                    0xCD => self.set_instruction(InstructionTypes::CALL, ""),
+                    0xCC => self.set_instruction(InstructionTypes::CZ, "", 3),
+                    0xCD => self.set_instruction(InstructionTypes::CALL, "", 3),
                     0xCE => self.byte_to_immediate_op(),
-                    0xCF => self.set_instruction(InstructionTypes::RST, ""),
-                    0xD0 => self.set_instruction(InstructionTypes::RNC, ""),
-                    0xD2 => self.set_instruction(InstructionTypes::JNC, ""),
-                    0xD3 => self.set_instruction(InstructionTypes::OUT, ""),
-                    0xD4 => self.set_instruction(InstructionTypes::CNC, ""),
+                    0xCF => self.set_instruction(InstructionTypes::RST, "", 1),
+                    0xD0 => self.set_instruction(InstructionTypes::RNC, "", 1),
+                    0xD2 => self.set_instruction(InstructionTypes::JNC, "", 3),
+                    0xD3 => self.set_instruction(InstructionTypes::OUT, "", 2),
+                    0xD4 => self.set_instruction(InstructionTypes::CNC, "", 3),
                     0xD6 => self.byte_to_immediate_op(),
-                    0xD7 => self.set_instruction(InstructionTypes::RST, ""),
-                    0xD8 => self.set_instruction(InstructionTypes::RC, ""),
+                    0xD7 => self.set_instruction(InstructionTypes::RST, "", 1),
+                    0xD8 => self.set_instruction(InstructionTypes::RC, "", 1),
                     0xD9 => self.name = "?? NOT IMP".to_string(),
-                    0xDA => self.set_instruction(InstructionTypes::JC, ""),
+                    0xDA => self.set_instruction(InstructionTypes::JC, "", 3),
                     0xDB => self.name = "IN NOT IMP".to_string(),
-                    0xDC => self.set_instruction(InstructionTypes::CC, ""),
+                    0xDC => self.set_instruction(InstructionTypes::CC, "", 3),
                     0xDD => self.name = "?? NOT IMP".to_string(),
                     0xDE => self.byte_to_immediate_op(),
-                    0xDF => self.set_instruction(InstructionTypes::RST, ""),
-                    0xE0 => self.set_instruction(InstructionTypes::RPO, ""),
-                    0xE2 => self.set_instruction(InstructionTypes::JPO, ""),
-                    0xE3 => self.set_instruction(InstructionTypes::XTHL, ""),
-                    0xE4 => self.set_instruction(InstructionTypes::CPO, ""),
+                    0xDF => self.set_instruction(InstructionTypes::RST, "", 1),
+                    0xE0 => self.set_instruction(InstructionTypes::RPO, "", 1),
+                    0xE2 => self.set_instruction(InstructionTypes::JPO, "", 3),
+                    0xE3 => self.set_instruction(InstructionTypes::XTHL, "", 1),
+                    0xE4 => self.set_instruction(InstructionTypes::CPO, "", 3),
                     0xE6 => self.byte_to_immediate_op(),
-                    0xE7 => self.set_instruction(InstructionTypes::RST, ""),
-                    0xE8 => self.set_instruction(InstructionTypes::RPE, ""),
-                    0xE9 => self.set_instruction(InstructionTypes::PCHL, ""),
-                    0xEA => self.set_instruction(InstructionTypes::JPE, ""),
-                    0xEB => self.set_instruction(InstructionTypes::XCHG, ""),
-                    0xEC => self.set_instruction(InstructionTypes::CPE, ""),
+                    0xE7 => self.set_instruction(InstructionTypes::RST, "", 1),
+                    0xE8 => self.set_instruction(InstructionTypes::RPE, "", 1),
+                    0xE9 => self.set_instruction(InstructionTypes::PCHL, "", 1),
+                    0xEA => self.set_instruction(InstructionTypes::JPE, "", 3),
+                    0xEB => self.set_instruction(InstructionTypes::XCHG, "", 1),
+                    0xEC => self.set_instruction(InstructionTypes::CPE, "", 3),
                     0xED => self.name = "?? NOT IMP".to_string(),
                     0xEE => self.byte_to_immediate_op(),
-                    0xEF => self.set_instruction(InstructionTypes::RST, ""),
-                    0xF0 => self.set_instruction(InstructionTypes::RP, ""),
-                    0xF2 => self.set_instruction(InstructionTypes::JP, ""),
-                    0xF3 => self.set_instruction(InstructionTypes::DI, ""),
-                    0xF4 => self.set_instruction(InstructionTypes::CP, ""),
+                    0xEF => self.set_instruction(InstructionTypes::RST, "", 1),
+                    0xF0 => self.set_instruction(InstructionTypes::RP, "", 1),
+                    0xF2 => self.set_instruction(InstructionTypes::JP, "", 3),
+                    0xF3 => self.set_instruction(InstructionTypes::DI, "", 1),
+                    0xF4 => self.set_instruction(InstructionTypes::CP, "", 3),
                     0xF6 => self.byte_to_immediate_op(),
-                    0xF7 => self.set_instruction(InstructionTypes::RST, ""),
-                    0xF8 => self.set_instruction(InstructionTypes::RM, ""),
-                    0xF9 => self.set_instruction(InstructionTypes::SPHL, ""),
-                    0xFA => self.set_instruction(InstructionTypes::JM, ""),
-                    0xFB => self.set_instruction(InstructionTypes::EI, ""),
-                    0xFC => self.set_instruction(InstructionTypes::CM, ""),
+                    0xF7 => self.set_instruction(InstructionTypes::RST, "", 1),
+                    0xF8 => self.set_instruction(InstructionTypes::RM, "", 1),
+                    0xF9 => self.set_instruction(InstructionTypes::SPHL, "", 1),
+                    0xFA => self.set_instruction(InstructionTypes::JM, "", 3),
+                    0xFB => self.set_instruction(InstructionTypes::EI, "", 1),
+                    0xFC => self.set_instruction(InstructionTypes::CM, "", 3),
                     0xFD => self.name = "?? NOT IMP".to_string(),
                     0xFE => self.byte_to_immediate_op(),
-                    0xFF => self.set_instruction(InstructionTypes::RST, ""),
+                    0xFF => self.set_instruction(InstructionTypes::RST, "", 1),
                     _ => 
                     {
                         println!("Byte: {:02X}", b);
@@ -236,29 +238,29 @@ impl Instruction
             {
                 match b & 0b00111111 
                 {
-                    0x00                      => self.set_instruction(InstructionTypes::NOP, ""),
+                    0x00                      => self.set_instruction(InstructionTypes::NOP, "", 1),
                     0x01 | 0x11 | 0x21 | 0x31 => self.decode_lxi(),
-                    0x02 | 0x12               => self.set_instruction(InstructionTypes::STAX, ""),
+                    0x02 | 0x12               => self.set_instruction(InstructionTypes::STAX, "", 1),
                     0x03 | 0x13 | 0x23 | 0x33 => self.decode_inx(),
                     0x04 | 0x0C | 0x14 | 0x1C | 0x24 | 0x2C | 0x34 | 0x3C  => self.decode_inr(),
                     0x05 | 0x0D |  0x15 | 0x1D | 0x25 | 0x2D | 0x35 | 0x3D => self.decode_dcr(),
                     0x06 | 0x0E | 0x16 | 0x1E | 0x26 | 0x2E | 0x36 | 0x3E  => self.byte_to_immediate_op(),
-                    0x07 => self.set_instruction(InstructionTypes::RLC, ""),
+                    0x07 => self.set_instruction(InstructionTypes::RLC, "", 1),
                     0x08 | 0x10 | 0x18 | 0x20 | 0x28 | 0x30 | 0x38        => self.name = "__ NOT IMP".to_string(),
                     0x09 | 0x19 | 0x29 | 0x39 => self.decode_dad(),
                     0x0B | 0x1B | 0x2B | 0x3B => self.decode_dcx(),
-                    0x0F => self.set_instruction(InstructionTypes::RRC, ""),
-                    0x17 => self.set_instruction(InstructionTypes::RAL, ""),
-                    0x1A | 0x0A => self.set_instruction(InstructionTypes::LDAX, ""),
-                    0x1F => self.set_instruction(InstructionTypes::RAR, ""),
-                    0x22 => self.set_instruction(InstructionTypes::SHLD, ""),
-                    0x27 => self.set_instruction(InstructionTypes::DAA, ""),
-                    0x2A => self.set_instruction(InstructionTypes::LHLD, ""),
-                    0x2F => self.set_instruction(InstructionTypes::CMA, ""),
-                    0x32 => self.set_instruction(InstructionTypes::STA, ""),
-                    0x37 => self.set_instruction(InstructionTypes::STC, ""),
-                    0x3A => self.set_instruction(InstructionTypes::LDA, ""),
-                    0x3F => self.set_instruction(InstructionTypes::CMC, ""),
+                    0x0F => self.set_instruction(InstructionTypes::RRC, "", 1),
+                    0x17 => self.set_instruction(InstructionTypes::RAL, "", 1),
+                    0x1A | 0x0A => self.set_instruction(InstructionTypes::LDAX, "", 1),
+                    0x1F => self.set_instruction(InstructionTypes::RAR,  "", 1),
+                    0x22 => self.set_instruction(InstructionTypes::SHLD, "", 3),
+                    0x27 => self.set_instruction(InstructionTypes::DAA,  "", 1),
+                    0x2A => self.set_instruction(InstructionTypes::LHLD, "", 3),
+                    0x2F => self.set_instruction(InstructionTypes::CMA,  "", 1),
+                    0x32 => self.set_instruction(InstructionTypes::STA,  "", 3),
+                    0x37 => self.set_instruction(InstructionTypes::STC,  "", 1),
+                    0x3A => self.set_instruction(InstructionTypes::LDA,  "", 3),
+                    0x3F => self.set_instruction(InstructionTypes::CMC,  "", 1),
                     _ => panic!("Misc should not exist!"),
                 }
             },
@@ -272,6 +274,7 @@ impl Instruction
     {
         self.low_nibble = Some(( self.machine_code & 0x30 ) >> 4);
         self.name = format!("POP {}", Registers::translate_to_reg_pair(self.low_nibble.unwrap()));
+        self.cycles = 1;
         self.instruction_type = InstructionTypes::POP;
     }
 
@@ -279,31 +282,32 @@ impl Instruction
     {
         self.low_nibble = Some(( self.machine_code & 0x30 ) >> 4);
         self.name = format!("PUSH {}", Registers::translate_to_reg_pair(self.low_nibble.unwrap()));
+        self.cycles = 1;
         self.instruction_type = InstructionTypes::PUSH;
     }
 
     fn decode_inx(&mut self)
     {
-        self.set_instruction(InstructionTypes::INX, "");
+        self.set_instruction(InstructionTypes::INX, "", 1);
         self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_dcx(&mut self)
     {
-        self.set_instruction(InstructionTypes::DCX, "");
+        self.set_instruction(InstructionTypes::DCX, "", 1);
         self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_dad(&mut self)
     {
-        self.set_instruction(InstructionTypes::DAD, "");
+        self.set_instruction(InstructionTypes::DAD, "", 1);
         self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_lxi(&mut self)
     {
         self.adress_mode = AddressingMode::Direct;
-        self.set_instruction(InstructionTypes::LXI, "");
+        self.set_instruction(InstructionTypes::LXI, "", 3);
         self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
@@ -313,6 +317,7 @@ impl Instruction
         self.adress_mode = AddressingMode::Direct;
         self.instruction_type = InstructionTypes::DCR;
         self.low_nibble = Some((self.machine_code & 0x38) >> 3);
+        self.cycles = 1;
         self.name = format!("DCR {}", Registers::translate_to_reg(self.low_nibble.unwrap()));
     }
 
@@ -320,6 +325,7 @@ impl Instruction
     {
         self.instruction_type = InstructionTypes::INR;
         self.low_nibble = Some((self.machine_code & 0x38) >> 3);
+        self.cycles = 1;
         self.name = format!("INR {}", Registers::translate_to_reg(self.low_nibble.unwrap()));
     }
 
@@ -345,6 +351,7 @@ impl Instruction
     fn byte_to_immediate_op(&mut self)
     {
         self.adress_mode = AddressingMode::Direct;
+        self.cycles = 2;
 
         match self.machine_code & 0xF0
         {
@@ -380,9 +387,10 @@ impl Instruction
         }
     }
 
-    fn set_instruction(&mut self, inst: InstructionTypes, suffix: &str)
+    fn set_instruction(&mut self, inst: InstructionTypes, suffix: &str, cycles: u8)
     {
         self.name = format!("{}{}", Instruction::instruction_to_string(inst.clone()), suffix);
+        self.cycles = cycles;
         self.instruction_type = inst;
     }
 

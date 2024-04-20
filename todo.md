@@ -13,7 +13,7 @@
 - [ ] Add functionality to dissasmbler to switch all numbers to hex
 - [ ] Add more informations to instructions in dissasembler, e.g. RST should also display a nubmer, CPI should show the value that is compared
 - [ ] Add cycle count to debugger
-- [ ] Add cycle count to each instruction
+- [x] Add cycle count to each instruction
 - [ ] Add possibility to run at certain HZ
 
 # Maybe
