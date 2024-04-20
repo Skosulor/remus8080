@@ -25,11 +25,11 @@ cargo build
 
 ## Arguments
 
-| flag    | short flag | Description                                  |
-----------|------------|-----------------------------------------------
-| --rom   | -r         |  path to rom to run on the emulator          |
-| --freq  | -f         |  Freqnecy to run the emulator, Default 2 MHZ |
------------------------------------------------------------------------
+| flag     | short flag | Description                                   |
+|----------|------------|-----------------------------------------------|
+| --rom    | -r         |  path to rom to run on the emulator           |
+| --freq   | -f         |  frequency to run the emulator, default 2 MHZ |
+-------------------------------------------------------------------------
 
 
 
