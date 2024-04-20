@@ -8,10 +8,12 @@
 - [X] Add Program counter to debugger
 - [ ] Refactor code in general, lots of code could probably be broken out
 - [ ] Pretify instruction matching in instructions.rs, it looks horrible..
-- [ ] Improve set_instruction function, add cycles and more?
-- [ ] Rename project, it is no longer about space invaders.. 
+- [X] Improve set_instruction function, add cycles and more?
+- [X] Rename project, it is no longer about space invaders.. 
 - [ ] Add functionality to dissasmbler to switch all numbers to hex
 - [ ] Add more informations to instructions in dissasembler, e.g. RST should also display a nubmer, CPI should show the value that is compared
+- [ ] Fix instruction numbering to represent actual number of instructions and not
+      address in memory
 - [X] Add cycle count to debugger
 - [X] Add cycle count to each instruction
 - [X] Add possibility to run at certain HZ

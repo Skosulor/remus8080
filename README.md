@@ -17,19 +17,41 @@ requirements: [cargo](https://doc.rust-lang.org/cargo/getting-started/installati
 cargo build
 ```
 
-## How to use
+## How to run the emulator
+
+When the emulator is ran in a terminal, a tui debugger/dissasembler will open up. 
+It will not execute any instructions until either a _[s]tep_ or _[c]ontinue_ 
+command is issued. 
+
+It has support for breakpoints and reading any memory address.
 
 ```sh
  remus8080 -r <PATH_TO_ROM> -f <CPU_FREQUENCY> 
 ```
 
-## Arguments
+### Arguments
 
 | flag     | short flag | Description                                   |
 |----------|------------|-----------------------------------------------|
 | --rom    | -r         |  path to rom to run on the emulator           |
 | --freq   | -f         |  frequency to run the emulator, default 2 MHZ |
 -------------------------------------------------------------------------
+
+## Using the dissassembler/debugger
+
+List of commands that can be issued to the debugger. The TUI will update during
+stepping but not will the emulator is in "run" which occurs after a _[c]ontinue_ 
+command is issued.
+
+| Command    | Description                                       |
+|----------  |---------------------------------------------------|
+| s [N]      | Step - execute N instructions                     |
+| q          | Quit                                              |
+| b [N]      | set Breakpoint at instruction N                   |
+| c          | Continue until breakpoint                         |
+| m [N]      | update Memory field to stat at adress N (decimal) |
+-----------------------------------------------------------------
+
 
 
 
