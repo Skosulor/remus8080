@@ -18,24 +18,25 @@ const MEMORY_SIZE: usize = 0xFFFFF;
 #[derive(Clone, Debug)]
 pub struct Processor 
 {
-    // clock_freq: f32,
-    stack_pointer: u16,
-    program_counter: u16,
-    memory: [u8; MEMORY_SIZE],
-    registers: Registers,
-    flags: StatusFlags,
-    current_op: Instruction,
-    out : u8, 
+    clock_frequency   : u32,
+    stack_pointer     : u16,
+    program_counter   : u16,
+    memory            : [u8; MEMORY_SIZE],
+    registers         : Registers,
+    flags             : StatusFlags,
+    current_op        : Instruction,
+    out               : u8, 
     interrupts_enabled: bool,
 }
 
 impl Processor 
 {
-    pub fn from_file(p: String) -> Processor 
+    pub fn from_file(p: String, hz: u32) -> Processor 
     {
         let mut proc = Processor 
         {
             stack_pointer     : 0x20,
+            clock_frequency   : hz,
             program_counter   : 0,
             memory            : [0; MEMORY_SIZE],
             flags             : StatusFlags::new(),
@@ -61,11 +62,12 @@ impl Processor
         self.interrupts_enabled = false;
     }
 
-    pub fn from_bytes(bytes: Vec<u8>) -> Processor 
+    pub fn from_bytes(bytes: Vec<u8>, hz: u32) -> Processor 
     {
         let mut processor = Processor 
         {
             stack_pointer     : 0x20,
+            clock_frequency   : hz,
             program_counter   : 0,
             memory            : [0; MEMORY_SIZE],
             flags             : StatusFlags::new(),
@@ -88,6 +90,10 @@ impl Processor
         self.fetch_instruction();
         self.execute_instruction();
         self.update_program_counter();
+        if self.clock_frequency > 0
+        {
+            std::thread::sleep(std::time::Duration::from_secs(1) / self.clock_frequency);
+        }
     }
 
     pub fn reset_pc(&mut self)

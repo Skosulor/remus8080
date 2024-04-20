@@ -14,7 +14,7 @@ mod tests
             .map(|_| rng.gen_range(1..255))
             .collect();
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0);
         let regs = Registers 
         {
             accumulator: 0,
@@ -70,7 +70,7 @@ mod tests
             .map(|_| rng.gen_range(1..255))
             .collect();
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0);
         let regs = Registers 
         {
             accumulator: 0,
@@ -125,7 +125,7 @@ mod tests
             .collect();
 
         let mem     = vec![0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         let reg     = Registers
         { 
             accumulator: 0,
@@ -178,7 +178,7 @@ mod tests
             .collect();
 
         let mem     = vec![0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0);
         let reg     = Registers
         { 
             accumulator: 0,
@@ -232,7 +232,7 @@ mod tests
             .collect();
 
         let mem     = vec![0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         let reg     = Registers
         { 
             accumulator: 0,
@@ -286,7 +286,7 @@ mod tests
             .collect();
 
         let mem     = vec![0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         let reg     = Registers
         { 
             accumulator: 0,
@@ -340,7 +340,7 @@ mod tests
             .collect();
 
         let mem     = vec![0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         let reg     = Registers
         { 
             accumulator: 0,
@@ -394,7 +394,7 @@ mod tests
             .collect();
 
         let mem     = vec![0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         let reg     = Registers
         { 
             accumulator: 10,
@@ -447,7 +447,7 @@ mod tests
 
         let mut numbers_copy = numbers.clone();
         let mem     = vec![0x04, 0x0c, 0x14, 0x1c, 0x24, 0x2c, 0x34, 0x3c];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         let reg     = Registers
         { 
             accumulator: 0,

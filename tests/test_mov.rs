@@ -18,7 +18,7 @@ mod tests
             0x16, randoms[2], 0x1E, randoms[3], 0x26,
             randoms[4], 0x2E, randoms[5], 0x36, randoms[6], 0x3E, randoms[7]];
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0));
 
         for _ in 0..8 {
             cpu.clock();
@@ -45,7 +45,7 @@ mod tests
             .collect::<Vec<u8>>();
 
         let mem: Vec<u8> = vec![0x7F, 0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0));
         let regs = Registers {
             accumulator: randoms[0],
             b: randoms[1],
@@ -77,7 +77,7 @@ mod tests
             .collect::<Vec<u8>>();
 
         let mem: Vec<u8> = vec![0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0));
         let regs = Registers {
             b: randoms[0],
             c: randoms[1],
@@ -110,7 +110,7 @@ mod tests
             .collect::<Vec<u8>>();
 
         let mem: Vec<u8> = vec![0x49, 0x48 , 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0));
         let regs = Registers {
             b: randoms[1],
             c: randoms[0],
@@ -144,7 +144,7 @@ mod tests
             .collect::<Vec<u8>>();
 
         let mem: Vec<u8> = vec![0x52, 0x50, 0x51, 0x53, 0x54, 0x55, 0x56, 0x57];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0));
         let regs = Registers {
             b: randoms[1],
             c: randoms[2],
@@ -176,7 +176,7 @@ mod tests
             .collect::<Vec<u8>>();
 
         let mem: Vec<u8> = vec![0x5B, 0x58, 0x59, 0x5A, 0x5C, 0x5D, 0x5E, 0x5F];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0));
         let regs = Registers {
             b: randoms[1],
             c: randoms[2],
@@ -208,7 +208,7 @@ mod tests
             .collect::<Vec<u8>>();
 
         let mem: Vec<u8> = vec![0x64, 0x66, 0x60, 0x61, 0x62, 0x63, 0x65, 0x67];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_bytes(mem, 0));
         let regs = Registers {
             b: randoms[2],
             c: randoms[3],
@@ -241,7 +241,7 @@ mod tests
             .collect::<Vec<u8>>();
 
         let mem: Vec<u8> = vec![0x6D, 0x6E, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6F];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         let regs = Registers {
             b: randoms[2],
             c: randoms[3],
@@ -273,7 +273,7 @@ mod tests
             .collect::<Vec<u8>>();
 
         let mem: Vec<u8> = vec![0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x77];
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         let regs = Registers {
             b: randoms[0],
             c: randoms[1],

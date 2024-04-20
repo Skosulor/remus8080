@@ -11,7 +11,7 @@ mod test
         mem[4]      = 0x13;
         mem[0x1337] = 0xC9;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         cpu.clock();
         cpu.clock();
 
@@ -36,7 +36,7 @@ mod test
         mem[2]      = 0x13;
         mem[0x1337] = 0xC9;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
         cpu.clock();
 
         // Add three: two bytes for address 
@@ -57,7 +57,7 @@ mod test
         mem[5]      = 0x13;
         mem[0x1337] = 0xC9;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
 
         cpu.set_flags_cszp(false, false, 0);
         cpu.clock();
@@ -82,7 +82,7 @@ mod test
         mem[0x1338] = 0x42;
         mem[0x1339] = 0x00;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
 
         cpu.set_flags_cszp(false, false, 0);
         cpu.clock();
@@ -107,7 +107,7 @@ mod test
         mem[0x1338] = 0x42;
         mem[0x1339] = 0x00;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
 
         cpu.set_flags_cszp(false, false, 0);
         cpu.clock();
@@ -131,7 +131,7 @@ mod test
         mem[0x1338] = 0x42;
         mem[0x1339] = 0x00;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
 
         cpu.set_flags_cszp(true, false, 0);
         cpu.clock();
@@ -155,7 +155,7 @@ mod test
         mem[0x1338] = 0x42;
         mem[0x1339] = 0x00;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
 
         // Parity is odd -> Jump
         cpu.set_flags_cszp(false, false, 1);
@@ -181,7 +181,7 @@ mod test
         mem[0x1338] = 0x42;
         mem[0x1339] = 0x00;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
 
         // Parity is Even -> Jump
         cpu.set_flags_cszp(false, true, 0);
@@ -207,7 +207,7 @@ mod test
         mem[0x1338] = 0x42;
         mem[0x1339] = 0x00;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
 
         cpu.set_flags_cszp(false, true, 0);
         cpu.clock();
@@ -231,7 +231,7 @@ mod test
         mem[0x1338] = 0x42;
         mem[0x1339] = 0x00;
 
-        let mut cpu = Processor::from_bytes(mem);
+        let mut cpu = Processor::from_buffer(mem, 0);
 
         cpu.set_flags_cszp(true, false, 0x80);
         cpu.clock();

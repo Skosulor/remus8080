@@ -19,7 +19,7 @@ fn main()
         return;
     }
 
-    let mut p = i8080::Processor::from_file(rom);
+    let mut p = i8080::Processor::from_file(rom, 0);
     let mut dgb = debugger::Debugger::default();
 
     dgb.execute(&mut p, true);
