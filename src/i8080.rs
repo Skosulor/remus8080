@@ -1233,4 +1233,8 @@ impl Processor
         self.flags.sign_flag   = sign(res);
         self.flags.zero_flag   = zero(res);
     }
+
+    pub fn set_clock_frequency(&mut self, clock_frequency: u32) {
+        self.clock_frequency = clock_frequency;
+    }
 }

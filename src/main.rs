@@ -1,25 +1,20 @@
-use std::env;
 use siri8080::*;
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+struct Options
+{
+    #[structopt(short = "r", long = "rom", help = "Path to ROM file")]
+    rom: String,
+
+    #[structopt( short = "f", long = "freq", help = "CPU frequency in Hz", default_value = "2000000")]
+    cpu_freq: u32,
+}
 
 fn main() 
 {
-    let args: Vec<String> = env::args().collect();
-    let mut rom = "".to_string();
-
-    if args.len() >= 2
-    {
-        rom.push_str(&env::current_dir().unwrap().to_string_lossy().to_string());  
-        rom.push_str("/");
-        rom.push_str(&args[1].to_string());
-    }
-    else
-    {
-        println!("Input path to ROM");
-        println!("./siri8080 PATH_TO_ROM");
-        return;
-    }
-
-    let mut p = i8080::Processor::from_file(rom, 0);
+    let args = Options::from_args();
+    let mut p = i8080::Processor::from_file(args.rom, args.cpu_freq);
     let mut dgb = debugger::Debugger::default();
 
     dgb.execute(&mut p, true);

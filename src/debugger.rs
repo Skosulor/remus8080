@@ -158,6 +158,7 @@ fn get_instructions(processor: &mut Processor) -> Vec<String>
 {
     let mut instructions: Vec<String> = Vec::new();
     let mut processor = processor.clone();
+    processor.set_clock_frequency(0);
     instructions.push("".to_string());
     for _ in 1 .. 48
     {
