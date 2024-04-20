@@ -19,7 +19,6 @@
 - [X] Add possibility to run at certain HZ
 
 # Maybe
-- [ ] Rename low_byte & high_byte in instructions to Registers & give them an enum type?
 - [ ] Handle interrupt -> requires injection of instruction (or skip?)
 
 # Implement Op Codes
