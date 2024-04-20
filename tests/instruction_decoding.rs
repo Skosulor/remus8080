@@ -1,9 +1,9 @@
 mod tests
 
 {
-    use siri8080::i8080::instructions::{InstructionTypes, Instruction};
-    use siri8080::i8080::registers::*;
-    use siri8080::i8080::flags::*;
+    use remus8080::i8080::instructions::{InstructionTypes, Instruction};
+    use remus8080::i8080::registers::*;
+    use remus8080::i8080::flags::*;
 
     #[test]
     fn set_get_flags()

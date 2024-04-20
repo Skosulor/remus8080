@@ -1,6 +1,6 @@
 mod test
 {
-    use siri8080::i8080::Processor;
+    use remus8080::i8080::Processor;
 
     #[test]
     fn call()

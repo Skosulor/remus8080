@@ -1,8 +1,8 @@
 mod tests
 
 {
-    use siri8080::i8080::registers::*;
-    use siri8080::i8080::Processor;
+    use remus8080::i8080::registers::*;
+    use remus8080::i8080::Processor;
     use rand::Rng;
 
     #[test]

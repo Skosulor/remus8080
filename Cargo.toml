@@ -1,6 +1,6 @@
 [package]
-name = "siri8080"
-version = "0.1.0"
+name = "remus8080"
+version = "1.0.0"
 authors = ["Skosulor"]
 edition = "2021"
 

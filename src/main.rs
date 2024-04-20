@@ -1,4 +1,4 @@
-use siri8080::*;
+use remus8080::*;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
