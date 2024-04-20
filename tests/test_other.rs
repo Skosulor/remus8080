@@ -7,7 +7,7 @@ mod tests
     fn xchg()
     {
         let mem = vec![0xEB, 0x00];
-        let mut cpu = Processor::from_buffer(mem, 0);
+        let mut cpu = Processor::from_bytes(mem, 0);
         let reg = Registers
         {
             accumulator: 0,
