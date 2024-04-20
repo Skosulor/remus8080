@@ -43,14 +43,14 @@ List of commands that can be issued to the debugger. The TUI will update during
 stepping but not will the emulator is in "run" which occurs after a _[c]ontinue_ 
 command is issued.
 
-| Command    | Description                                       |
-|----------  |---------------------------------------------------|
-| s [N]      | Step - execute N instructions                     |
-| q          | Quit                                              |
-| b [N]      | set Breakpoint at instruction N                   |
-| c          | Continue until breakpoint                         |
-| m [N]      | update Memory field to stat at adress N (decimal) |
------------------------------------------------------------------
+| Command    | Description                                        |
+|----------  |----------------------------------------------------|
+| s [N]      | Step - execute N instructions                      |
+| q          | Quit                                               |
+| b [N]      | set Breakpoint at instruction N                    |
+| c          | Continue until breakpoint                          |
+| m [N]      | update Memory field to start at adress N (decimal) |
+-------------------------------------------------------------------
 
 
 
