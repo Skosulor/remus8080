@@ -82,11 +82,15 @@ impl<'a> Debugger<'a>
         {
             processor.clock();
             let pc = processor.get_pc();
-            let found = self.breakpoints.contains(&pc);
-            if found 
+            let instruction_length = processor.get_current_op().get_length() ;
+
+            for breakpoint in self.breakpoints.iter()
             {
-                self.update_disassembler(processor);
-                break;
+                if *breakpoint >= pc && *breakpoint < (pc + instruction_length as u16)
+                {
+                    self.update_disassembler(processor);
+                    return;
+                }
             }
         }
     }
