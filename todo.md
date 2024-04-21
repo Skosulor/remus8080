@@ -1,5 +1,3 @@
-#+TITLE: Todo
-
 # General
     - [X] Brake out debug commands from main
     - [X] Give dissasmbler sane variable & function names
