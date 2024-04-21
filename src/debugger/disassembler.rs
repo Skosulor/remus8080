@@ -279,7 +279,6 @@ impl<'a> Disassembler<'a>
         let cursor_y = shell_widget_position.y + 3;
         print!("{}", termion::cursor::Goto(cursor_x, cursor_y));
         terminal.backend_mut().flush().expect("Failed to flush backend");
-        // backend.flush().expect("Failed to flush backend");
     }
 }
 
