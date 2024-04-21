@@ -4,10 +4,10 @@ use crate::i8080::registers::*;
 pub enum AddressingMode 
 {
     Direct,
-    // Pair,
-    // StackPointer,
-    // ImmediateOneByte,
-    // ImmediateTwoBytes,
+    Pair,
+    StackPointer,
+    ImmediateOneByte,
+    ImmediateTwoBytes,
     Unknown,
 }
 
@@ -73,15 +73,29 @@ impl Instruction
 
     pub fn from_byte(b: u8) -> Instruction 
     {
-        let mut ins = Instruction::new();
-        ins.byte_to_op(b);
-        ins
+        let mut instruction = Instruction::new();
+        instruction.byte_to_op(b);
+        return instruction;
     }
 
     pub fn get_name_byte(self) -> (u8, String) 
     {
         (self.machine_code, self.name.clone())
     }
+
+    pub fn get_length(&self) -> u8
+    {
+        return match self.adress_mode
+        {
+            AddressingMode::Direct => 1,
+            AddressingMode::Pair => 1,
+            AddressingMode::StackPointer => 1,
+            AddressingMode::ImmediateOneByte => 2,
+            AddressingMode::ImmediateTwoBytes => 3,
+            AddressingMode::Unknown => 1,
+        };
+    }
+
 
     pub fn byte_to_op(&mut self, b: u8) 
     {
@@ -168,64 +182,64 @@ impl Instruction
             {
                 match b 
                 {
-                    0xC0 => self.set_instruction(InstructionTypes::RNZ, "", 1),
+                    0xC0 => self.set_instruction(InstructionTypes::RNZ, "", 1, AddressingMode::Direct),
                     0xC1 | 0xD1 | 0xE1 | 0xF1 => self.decode_pop(),
-                    0xC2 => self.set_instruction(InstructionTypes::JNZ, "", 3),
-                    0xC3 => self.set_instruction(InstructionTypes::JMP, "", 3),
-                    0xC4 => self.set_instruction(InstructionTypes::CNZ, "", 3),
+                    0xC2 => self.set_instruction(InstructionTypes::JNZ, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0xC3 => self.set_instruction(InstructionTypes::JMP, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0xC4 => self.set_instruction(InstructionTypes::CNZ, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xC5 | 0xD5 | 0xE5 | 0xF5 => self.decode_push(),
                     0xC6 => self.byte_to_immediate_op(),
-                    0xC7 => self.set_instruction(InstructionTypes::RST, "", 1),
-                    0xC8 => self.set_instruction(InstructionTypes::RZ, "", 1),
-                    0xC9 => self.set_instruction(InstructionTypes::RET, "", 1),
-                    0xCA => self.set_instruction(InstructionTypes::JZ, "", 3),
+                    0xC7 => self.set_instruction(InstructionTypes::RST, "", 1, AddressingMode::Direct),
+                    0xC8 => self.set_instruction(InstructionTypes::RZ, "", 1, AddressingMode::Direct),
+                    0xC9 => self.set_instruction(InstructionTypes::RET, "", 1, AddressingMode::Direct),
+                    0xCA => self.set_instruction(InstructionTypes::JZ, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xCB => self.name = "?? NOT IMP".to_string(),
-                    0xCC => self.set_instruction(InstructionTypes::CZ, "", 3),
-                    0xCD => self.set_instruction(InstructionTypes::CALL, "", 3),
+                    0xCC => self.set_instruction(InstructionTypes::CZ, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0xCD => self.set_instruction(InstructionTypes::CALL, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xCE => self.byte_to_immediate_op(),
-                    0xCF => self.set_instruction(InstructionTypes::RST, "", 1),
-                    0xD0 => self.set_instruction(InstructionTypes::RNC, "", 1),
-                    0xD2 => self.set_instruction(InstructionTypes::JNC, "", 3),
-                    0xD3 => self.set_instruction(InstructionTypes::OUT, "", 2),
-                    0xD4 => self.set_instruction(InstructionTypes::CNC, "", 3),
+                    0xCF => self.set_instruction(InstructionTypes::RST, "", 1, AddressingMode::Direct),
+                    0xD0 => self.set_instruction(InstructionTypes::RNC, "", 1, AddressingMode::Direct),
+                    0xD2 => self.set_instruction(InstructionTypes::JNC, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0xD3 => self.set_instruction(InstructionTypes::OUT, "", 2, AddressingMode::Unknown),
+                    0xD4 => self.set_instruction(InstructionTypes::CNC, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xD6 => self.byte_to_immediate_op(),
-                    0xD7 => self.set_instruction(InstructionTypes::RST, "", 1),
-                    0xD8 => self.set_instruction(InstructionTypes::RC, "", 1),
+                    0xD7 => self.set_instruction(InstructionTypes::RST, "", 1, AddressingMode::Direct),
+                    0xD8 => self.set_instruction(InstructionTypes::RC, "", 1, AddressingMode::Direct),
                     0xD9 => self.name = "?? NOT IMP".to_string(),
-                    0xDA => self.set_instruction(InstructionTypes::JC, "", 3),
+                    0xDA => self.set_instruction(InstructionTypes::JC, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xDB => self.name = "IN NOT IMP".to_string(),
-                    0xDC => self.set_instruction(InstructionTypes::CC, "", 3),
+                    0xDC => self.set_instruction(InstructionTypes::CC, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xDD => self.name = "?? NOT IMP".to_string(),
                     0xDE => self.byte_to_immediate_op(),
-                    0xDF => self.set_instruction(InstructionTypes::RST, "", 1),
-                    0xE0 => self.set_instruction(InstructionTypes::RPO, "", 1),
-                    0xE2 => self.set_instruction(InstructionTypes::JPO, "", 3),
-                    0xE3 => self.set_instruction(InstructionTypes::XTHL, "", 1),
-                    0xE4 => self.set_instruction(InstructionTypes::CPO, "", 3),
+                    0xDF => self.set_instruction(InstructionTypes::RST, "", 1, AddressingMode::Direct),
+                    0xE0 => self.set_instruction(InstructionTypes::RPO, "", 1, AddressingMode::StackPointer),
+                    0xE2 => self.set_instruction(InstructionTypes::JPO, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0xE3 => self.set_instruction(InstructionTypes::XTHL, "", 1, AddressingMode::Pair),
+                    0xE4 => self.set_instruction(InstructionTypes::CPO, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xE6 => self.byte_to_immediate_op(),
-                    0xE7 => self.set_instruction(InstructionTypes::RST, "", 1),
-                    0xE8 => self.set_instruction(InstructionTypes::RPE, "", 1),
-                    0xE9 => self.set_instruction(InstructionTypes::PCHL, "", 1),
-                    0xEA => self.set_instruction(InstructionTypes::JPE, "", 3),
-                    0xEB => self.set_instruction(InstructionTypes::XCHG, "", 1),
-                    0xEC => self.set_instruction(InstructionTypes::CPE, "", 3),
+                    0xE7 => self.set_instruction(InstructionTypes::RST, "", 1, AddressingMode::Direct),
+                    0xE8 => self.set_instruction(InstructionTypes::RPE, "", 1, AddressingMode::Direct),
+                    0xE9 => self.set_instruction(InstructionTypes::PCHL, "", 1, AddressingMode::Pair),
+                    0xEA => self.set_instruction(InstructionTypes::JPE, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0xEB => self.set_instruction(InstructionTypes::XCHG, "", 1, AddressingMode::Pair),
+                    0xEC => self.set_instruction(InstructionTypes::CPE, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xED => self.name = "?? NOT IMP".to_string(),
                     0xEE => self.byte_to_immediate_op(),
-                    0xEF => self.set_instruction(InstructionTypes::RST, "", 1),
-                    0xF0 => self.set_instruction(InstructionTypes::RP, "", 1),
-                    0xF2 => self.set_instruction(InstructionTypes::JP, "", 3),
-                    0xF3 => self.set_instruction(InstructionTypes::DI, "", 1),
-                    0xF4 => self.set_instruction(InstructionTypes::CP, "", 3),
+                    0xEF => self.set_instruction(InstructionTypes::RST, "", 1, AddressingMode::Direct),
+                    0xF0 => self.set_instruction(InstructionTypes::RP, "", 1, AddressingMode::Direct),
+                    0xF2 => self.set_instruction(InstructionTypes::JP, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0xF3 => self.set_instruction(InstructionTypes::DI, "", 1, AddressingMode::Unknown),
+                    0xF4 => self.set_instruction(InstructionTypes::CP, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xF6 => self.byte_to_immediate_op(),
-                    0xF7 => self.set_instruction(InstructionTypes::RST, "", 1),
-                    0xF8 => self.set_instruction(InstructionTypes::RM, "", 1),
-                    0xF9 => self.set_instruction(InstructionTypes::SPHL, "", 1),
-                    0xFA => self.set_instruction(InstructionTypes::JM, "", 3),
-                    0xFB => self.set_instruction(InstructionTypes::EI, "", 1),
-                    0xFC => self.set_instruction(InstructionTypes::CM, "", 3),
+                    0xF7 => self.set_instruction(InstructionTypes::RST, "", 1, AddressingMode::Direct),
+                    0xF8 => self.set_instruction(InstructionTypes::RM, "", 1, AddressingMode::Direct),
+                    0xF9 => self.set_instruction(InstructionTypes::SPHL, "", 1, AddressingMode::Pair),
+                    0xFA => self.set_instruction(InstructionTypes::JM, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0xFB => self.set_instruction(InstructionTypes::EI, "", 1, AddressingMode::Unknown),
+                    0xFC => self.set_instruction(InstructionTypes::CM, "", 3, AddressingMode::ImmediateTwoBytes),
                     0xFD => self.name = "?? NOT IMP".to_string(),
                     0xFE => self.byte_to_immediate_op(),
-                    0xFF => self.set_instruction(InstructionTypes::RST, "", 1),
+                    0xFF => self.set_instruction(InstructionTypes::RST, "", 1, AddressingMode::Direct),
                     _ => 
                     {
                         println!("Byte: {:02X}", b);
@@ -238,29 +252,29 @@ impl Instruction
             {
                 match b & 0b00111111 
                 {
-                    0x00                      => self.set_instruction(InstructionTypes::NOP, "", 1),
+                    0x00                      => self.set_instruction(InstructionTypes::NOP, "", 1, AddressingMode::Unknown),
                     0x01 | 0x11 | 0x21 | 0x31 => self.decode_lxi(),
-                    0x02 | 0x12               => self.set_instruction(InstructionTypes::STAX, "", 1),
+                    0x02 | 0x12               => self.set_instruction(InstructionTypes::STAX, "", 1, AddressingMode::Pair),
                     0x03 | 0x13 | 0x23 | 0x33 => self.decode_inx(),
                     0x04 | 0x0C | 0x14 | 0x1C | 0x24 | 0x2C | 0x34 | 0x3C  => self.decode_inr(),
                     0x05 | 0x0D |  0x15 | 0x1D | 0x25 | 0x2D | 0x35 | 0x3D => self.decode_dcr(),
                     0x06 | 0x0E | 0x16 | 0x1E | 0x26 | 0x2E | 0x36 | 0x3E  => self.byte_to_immediate_op(),
-                    0x07 => self.set_instruction(InstructionTypes::RLC, "", 1),
+                    0x07 => self.set_instruction(InstructionTypes::RLC, "", 1, AddressingMode::Direct),
                     0x08 | 0x10 | 0x18 | 0x20 | 0x28 | 0x30 | 0x38        => self.name = "__ NOT IMP".to_string(),
                     0x09 | 0x19 | 0x29 | 0x39 => self.decode_dad(),
                     0x0B | 0x1B | 0x2B | 0x3B => self.decode_dcx(),
-                    0x0F => self.set_instruction(InstructionTypes::RRC, "", 1),
-                    0x17 => self.set_instruction(InstructionTypes::RAL, "", 1),
-                    0x1A | 0x0A => self.set_instruction(InstructionTypes::LDAX, "", 1),
-                    0x1F => self.set_instruction(InstructionTypes::RAR,  "", 1),
-                    0x22 => self.set_instruction(InstructionTypes::SHLD, "", 3),
-                    0x27 => self.set_instruction(InstructionTypes::DAA,  "", 1),
-                    0x2A => self.set_instruction(InstructionTypes::LHLD, "", 3),
-                    0x2F => self.set_instruction(InstructionTypes::CMA,  "", 1),
-                    0x32 => self.set_instruction(InstructionTypes::STA,  "", 3),
-                    0x37 => self.set_instruction(InstructionTypes::STC,  "", 1),
-                    0x3A => self.set_instruction(InstructionTypes::LDA,  "", 3),
-                    0x3F => self.set_instruction(InstructionTypes::CMC,  "", 1),
+                    0x0F => self.set_instruction(InstructionTypes::RRC, "", 1, AddressingMode::Direct),
+                    0x17 => self.set_instruction(InstructionTypes::RAL, "", 1, AddressingMode::Direct),
+                    0x1A | 0x0A => self.set_instruction(InstructionTypes::LDAX, "", 1, AddressingMode::Pair),
+                    0x1F => self.set_instruction(InstructionTypes::RAR,  "", 1, AddressingMode::Direct),
+                    0x22 => self.set_instruction(InstructionTypes::SHLD, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0x27 => self.set_instruction(InstructionTypes::DAA,  "", 1, AddressingMode::Unknown),
+                    0x2A => self.set_instruction(InstructionTypes::LHLD, "", 3, AddressingMode::ImmediateTwoBytes),
+                    0x2F => self.set_instruction(InstructionTypes::CMA,  "", 1, AddressingMode::Unknown),
+                    0x32 => self.set_instruction(InstructionTypes::STA,  "", 3, AddressingMode::ImmediateTwoBytes),
+                    0x37 => self.set_instruction(InstructionTypes::STC,  "", 1, AddressingMode::Unknown),
+                    0x3A => self.set_instruction(InstructionTypes::LDA,  "", 3, AddressingMode::ImmediateTwoBytes),
+                    0x3F => self.set_instruction(InstructionTypes::CMC,  "", 1, AddressingMode::Unknown),
                     _ => panic!("Misc should not exist!"),
                 }
             },
@@ -274,6 +288,7 @@ impl Instruction
     {
         self.low_nibble = Some(( self.machine_code & 0x30 ) >> 4);
         self.name = format!("POP {}", Registers::translate_to_reg_pair(self.low_nibble.unwrap()));
+        self.adress_mode = AddressingMode::StackPointer;
         self.cycles = 1;
         self.instruction_type = InstructionTypes::POP;
     }
@@ -282,32 +297,33 @@ impl Instruction
     {
         self.low_nibble = Some(( self.machine_code & 0x30 ) >> 4);
         self.name = format!("PUSH {}", Registers::translate_to_reg_pair(self.low_nibble.unwrap()));
+        self.adress_mode = AddressingMode::StackPointer;
         self.cycles = 1;
         self.instruction_type = InstructionTypes::PUSH;
     }
 
     fn decode_inx(&mut self)
     {
-        self.set_instruction(InstructionTypes::INX, "", 1);
+        self.set_instruction(InstructionTypes::INX, "", 1, AddressingMode::Pair);
         self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_dcx(&mut self)
     {
-        self.set_instruction(InstructionTypes::DCX, "", 1);
+        self.set_instruction(InstructionTypes::DCX, "", 1, AddressingMode::Direct);
         self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_dad(&mut self)
     {
-        self.set_instruction(InstructionTypes::DAD, "", 1);
+        self.set_instruction(InstructionTypes::DAD, "", 1, AddressingMode::Direct);
         self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
     fn decode_lxi(&mut self)
     {
         self.adress_mode = AddressingMode::Direct;
-        self.set_instruction(InstructionTypes::LXI, "", 3);
+        self.set_instruction(InstructionTypes::LXI, "", 3, AddressingMode::ImmediateOneByte);
         self.low_nibble = Some((self.machine_code & 0x30) >> 4);
     }
 
@@ -326,6 +342,7 @@ impl Instruction
         self.instruction_type = InstructionTypes::INR;
         self.low_nibble = Some((self.machine_code & 0x38) >> 3);
         self.cycles = 1;
+        self.adress_mode = AddressingMode::Direct;
         self.name = format!("INR {}", Registers::translate_to_reg(self.low_nibble.unwrap()));
     }
 
@@ -350,7 +367,7 @@ impl Instruction
 
     fn byte_to_immediate_op(&mut self)
     {
-        self.adress_mode = AddressingMode::Direct;
+        self.adress_mode = AddressingMode::ImmediateOneByte;
         self.cycles = 2;
 
         match self.machine_code & 0xF0
@@ -387,8 +404,9 @@ impl Instruction
         }
     }
 
-    fn set_instruction(&mut self, inst: InstructionTypes, suffix: &str, cycles: u8)
+    fn set_instruction(&mut self, inst: InstructionTypes, suffix: &str, cycles: u8, addressmode: AddressingMode)
     {
+        self.adress_mode = addressmode;
         self.name = format!("{}{}", Instruction::instruction_to_string(inst.clone()), suffix);
         self.cycles = cycles;
         self.instruction_type = inst;

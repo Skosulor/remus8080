@@ -87,13 +87,17 @@ impl Processor
     pub fn clock(&mut self) 
     {
         self.fetch_instruction();
-        self.fetch_instruction();
         self.execute_instruction();
         self.update_program_counter();
         if self.clock_frequency > 0
         {
             std::thread::sleep(std::time::Duration::from_secs(1) / self.clock_frequency);
         }
+    }
+
+    pub fn get_instruction_length(&self) -> u8
+    {
+        return self.current_op.get_length();
     }
 
     pub fn reset_pc(&mut self)
