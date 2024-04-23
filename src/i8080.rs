@@ -107,7 +107,10 @@ impl Processor
 
     pub fn fetch_instruction(&mut self)  
     {
-        self.current_op.byte_to_op(self.memory[self.program_counter as usize]);
+        let op = self.memory[self.program_counter as usize];
+        let immediate_lsb = self.memory[(self.program_counter + 1) as usize];
+        let immediate_msb = self.memory[(self.program_counter + 2) as usize];
+        self.current_op.byte_to_op(op, immediate_lsb, immediate_msb);
     }
 
     fn execute_instruction(&mut self)
