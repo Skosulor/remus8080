@@ -49,7 +49,7 @@ command is issued.
 | q          | Quit                                                      |
 | b [N]      | set Breakpoint at instruction N                           |
 | c          | Continue until breakpoint                                 |
-| m [N]      | update Memory field to start at adress N (decimal or hex) |
+| m [N]      | update Memory field to start at address N (decimal or hex) |
 --------------------------------------------------------------------------
 
 
