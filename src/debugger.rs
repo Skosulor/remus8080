@@ -164,7 +164,15 @@ fn get_instructions(processor: &mut Processor) -> Vec<String>
     let mut processor = processor.clone();
     processor.set_clock_frequency(0);
     instructions.push("".to_string());
-    for _ in 1 .. 48
+
+    processor.fetch_instruction();
+    let instruction = processor.get_current_op();
+    let (byte, name) = instruction.get_name_byte();
+
+    instructions.push(String::from(format!(">>>{a:>4}:     0x{b:02X} {c:}", 
+                                           a=(processor.get_pc() as usize), b=byte, c=name)));
+    processor.clock();
+    for _ in 1 .. 47
     {
         processor.fetch_instruction();
         let instruction = processor.get_current_op();
