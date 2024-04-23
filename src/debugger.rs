@@ -185,18 +185,30 @@ fn get_instructions(processor: &mut Processor) -> Vec<String>
     return instructions
 }
 
-fn input_to_u16(input: Option<&str>) -> u16
+fn input_to_u16(input: Option<&str>) -> u16 
 {
-    match input
+    match input 
+    {
+        Some(value) => 
         {
-            Some(value) => 
+            if value.starts_with("0x") || value.starts_with("0X") 
             {
-                match value.parse::<u16>()
+                match u16::from_str_radix(&value[2..], 16) 
                 {
                     Ok(value) => return value,
                     Err(_) => return 0,
-                };
-            },
-            None => return 0,
-        };
+                }
+            } 
+            else 
+            {
+                match value.parse::<u16>() 
+                {
+                    Ok(value) => return value,
+                    Err(_) => return 0,
+                }
+            }
+        },
+        None => return 0,
+    }
 }
+
